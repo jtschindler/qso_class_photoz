@@ -7,7 +7,7 @@ try:  # Python 3.x
 except ImportError:  # Python 2.x
     from distutils.command.build_py import build_py
 
-setup(name='class_photoz',
+setup(name='qso_class_photoz',
       version='0.1.1',
       description='Machine Learning and Photometric Fitting for phot. redshift estimation and candidate classification',
       author='Jan-Torge Schindler',

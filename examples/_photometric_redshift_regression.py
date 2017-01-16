@@ -13,9 +13,9 @@ from sklearn.grid_search import GridSearchCV
 from sklearn.cross_validation import train_test_split
 
 
-import ml_sets as sets
-import ml_quasar_sample as qs
-import rf_reg as rf
+from class_photoz import ml_sets as sets
+from class_photoz import ml_quasar_sample as qs
+from class_photoz import rf_reg as rf
 
 
 
@@ -200,42 +200,55 @@ MAIN ROUTINE
 # -----------------------------------------------------------------------------
 
 # Load the Quasar catalog
-df_quasars = pd.read_csv('../class_photoz/data/DR7_DR12Q_flux_cat.csv')
+# df_quasars = pd.read_csv('../class_photoz/data/DR7_DR12Q_flux_cat.csv')
+# df_quasars = pd.read_hdf('../class_photoz/data/DR7DR14Q_flux_cat.hdf5','data')
+df_quasars = pd.read_hdf('../class_photoz/data/brightqsos.hdf5','data')
 # Set passband names for flux ratio calculation
+
+
+
 passband_names = [\
         'SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
-        # '2MASS_h','2MASS_j','2MASS_ks', \
+        'TMASS_j','TMASS_h','TMASS_k', \
         'WISE_w1','WISE_w2', \
         # 'WISE_w3' \
         ]
 
+for name in passband_names:
+    df_quasars.rename(columns={'obsFlux_'+name:name},inplace=True)
+    df_quasars.rename(columns={'obsFluxErr_'+name:'sigma_'+name},inplace=True)
+
+print df_quasars.columns
 # Calculate flux ratios and save all flux ratios as features
+df_quasars.replace(np.inf, np.nan,inplace=True)
+
 df_quasars,features = qs.prepare_flux_ratio_catalog(df_quasars,passband_names)
 
 # Manually set the list of features
-# features = ['SDSS_i','ug','gr','ri','iz', \
+# features = ['SDSS_i','ug','gr','ri','iz',]
 # 'sigma_gr','sigma_ri','sigma_iz','weight']
 # features = ['SDSS_i','ug','gr','ri','iz','zh','WISE_w1','2MASS_j','hj', 'jks', 'ksw1', 'w1w2','w2w3']
 features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
 # 'sigma_gr','sigma_ri','sigma_iz','sigma_zw1','sigma_w1w2']
 # features = ['SDSS_i','2MASS_j','ug','gr','ri','iz','zh','hj', 'jks']
 # features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1', 'w1w2']
-# features = ['SDSS_i','WISE_w1','2MASS_j','ug','gr','ri','iz','zh','hj', 'jks', 'ksw1', 'w1w2']
+# features = ['SDSS_i','WISE_w1','TMASS_j','ug','gr','ri','iz','zj','jh', 'hk', 'kw1', 'w1w2']
 # features = ['WISE_w1','2MASS_j','hj', 'jks', 'ksw1', 'w1w2']
 
 # Set the label for regression
-label = 'redshift'
+# label = 'redshift'
+label = 'z'
 
 # -----------------------------------------------------------------------------
 # RANDOM FOREST REGRESSION
 # -----------------------------------------------------------------------------
-
+rand_state = 1
 # Set parameters for random forest regression
-params = {'n_estimators': 200, 'max_depth': 25, 'min_samples_split': 2, 'n_jobs': 4}
+params = {'n_estimators': 200, 'max_depth': 25, 'min_samples_split': 2, 'n_jobs': 4, 'random_state':rand_state}
 
 
 # Run the example
-rf.rf_reg_example(df_quasars,features,label,params)
+rf.rf_reg_example(df_quasars,features,label,params,rand_state)
 
 # Set parameters for random forest grid search
 # param_grid = [{'n_estimators': [25,50,100,200], 'min_samples_split': [2,3,4], \

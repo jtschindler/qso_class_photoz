@@ -11,7 +11,7 @@ import ml_sets as sets
 import ml_analysis as ml_an
 import photoz_analysis as pz_an
 
-def rf_reg_grid_search(df,features,label,param_grid):
+def rf_reg_grid_search(df,features,label,param_grid,rand_state,scores):
     """This routine calculates the random forest regression on a grid of
     hyper-parameters for the random forest method to test the best
     hyper-parameters. The analysis results of the test will be written out.
@@ -35,19 +35,20 @@ def rf_reg_grid_search(df,features,label,param_grid):
     X,y = sets.build_matrices(df, features,label)
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X,y, test_size=0.2,random_state=0)
+        X,y, test_size=0.2,random_state=rand_state)
 
     print X_train.shape, X_test.shape
 
 
-    scores = ['r2']
+
 
     for score in scores:
         print("# Tuning hyper-parameters for %s" % score)
         print()
 
-        reg = GridSearchCV(RandomForestRegressor(random_state=0), param_grid, cv=5,
-                           scoring='%s' % score,n_jobs =4)
+        reg = GridSearchCV(RandomForestRegressor(random_state=rand_state), \
+                        param_grid,scoring='%s' % score,cv=5,n_jobs=4)
+
         reg.fit(X_train, y_train)
 
         print("Best parameters set found on training set:")
@@ -62,7 +63,7 @@ def rf_reg_grid_search(df,features,label,param_grid):
         print()
 
 
-def rf_reg_example(df,features,label,params):
+def rf_reg_example(df,features,label,params,rand_state):
     """This routine calculates an example of the random forest regression tuned
     to photometric redshift estimation. The results will be analyzed with the
     analyis routines/functions provided in ml_eval.py and photoz_analysis.py
@@ -91,7 +92,7 @@ def rf_reg_example(df,features,label,params):
     # X = preprocessing.robust_scale(X)
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X,y, test_size=0.2, random_state=0)
+        X,y, test_size=0.2, random_state=rand_state)
 
     # Leftover from trying out weights
     # w_train = X_train[:,-1]
