@@ -4,11 +4,12 @@ import math
 
 import matplotlib.pyplot as plt
 
-from sklearn import preprocessing
+from sklearn import preprocessing, cross_validation
 
 
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
+
 
 from class_photoz import ml_sets as sets
 from class_photoz import ml_quasar_sample as qs
@@ -16,14 +17,11 @@ from class_photoz import rf_reg as rf
 from class_photoz import ml_analysis as ml_an
 from class_photoz import photoz_analysis as pz_an
 
-def grid_search_example():
-
+def DR7DR14_grid_search():
     # --------------------------------------------------------------------------
     # Preparing the feature matrix
     # --------------------------------------------------------------------------
     df_train = pd.read_hdf('../class_photoz/data/DR7DR14Q_flux_cat.hdf5','data')
-
-    df_train = df_train.sample(frac=0.1)
 
     passband_names = [\
             'SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
@@ -43,14 +41,55 @@ def grid_search_example():
     features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
     label = 'Z'
     rand_state = 1
-    param_grid = [{'n_estimators': [5,10], 'min_samples_split': [2], \
-                     'max_depth' : [15]} ]
+    param_grid = [{'n_estimators': [25,50,100,200], 'min_samples_split': [2,3,4], \
+                     'max_depth' : [15,20,25]} ]
+    scores = ['neg_mean_absolute_error','neg_mean_squared_error','r2',]
+    params = {'cv':5,'n_jobs':2}
+
+
+    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores)
+
+def simqsos_grid_search():
+
+    # --------------------------------------------------------------------------
+    # Preparing the feature matrix
+    # --------------------------------------------------------------------------
+    df_train = pd.read_hdf('../class_photoz/data/brightqsos_2.hdf5','data')
+
+    passband_names = [\
+            'SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
+            # 'TMASS_j','TMASS_h','TMASS_k', \
+            'WISE_w1','WISE_w2', \
+            # 'WISE_w3' \
+            ]
+
+    for name in passband_names:
+        df_train.rename(columns={'obsFlux_'+name:name},inplace=True)
+        df_train.rename(columns={'obsFluxErr_'+name:'sigma_'+name},inplace=True)
+
+    df_train.replace(np.inf, np.nan,inplace=True)
+
+    df_train,features = qs.prepare_flux_ratio_catalog(df_train,passband_names)
+
+    # --------------------------------------------------------------------------
+    # Random Forest Regression Grid Search
+    # --------------------------------------------------------------------------
+
+    features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
+    label = 'z'
+    rand_state = 1
+    param_grid = [{'n_estimators': [25,50], 'min_samples_split': [2,3], \
+                     'max_depth' : [15,]} ]
     # scores = ['neg_mean_absolute_error','neg_mean_squared_error','r2',]
-    scores = ['r2',]
+    scores = ['neg_mean_absolute_error']
+    params = {'cv':5,'n_jobs':2}
+
+
+    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'simqsos')
 
 
 
-    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'test')
+
 
 def test_example():
     # --------------------------------------------------------------------------
@@ -129,8 +168,9 @@ def predict_example():
     pz_an.plot_error_hist(df_test['Z'],df_test['rf_photoz'])
     plt.show()
 
-grid_search_example()
+# grid_search_example()
 
 # test_example()
 
 # predict_example()
+simqsos_grid_search()

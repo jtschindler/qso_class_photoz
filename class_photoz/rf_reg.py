@@ -1,17 +1,18 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
-from sklearn.grid_search import GridSearchCV
+import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.cross_validation import train_test_split
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV
 # from sklearn.learning_curve import validation_curve
 from sklearn import preprocessing
+from sklearn.metrics import classification_report
 
 import ml_sets as sets
 import ml_analysis as ml_an
 import photoz_analysis as pz_an
 
-def rf_reg_grid_search(df,features,label,param_grid,rand_state,scores):
+def rf_reg_grid_search(df,features,label,param_grid,rand_state,scores,name):
     """This routine calculates the random forest regression on a grid of
     hyper-parameters for the random forest method to test the best
     hyper-parameters. The analysis results of the test will be written out.
@@ -39,15 +40,12 @@ def rf_reg_grid_search(df,features,label,param_grid,rand_state,scores):
 
     print X_train.shape, X_test.shape
 
-
-
-
     for score in scores:
         print("# Tuning hyper-parameters for %s" % score)
         print()
 
         reg = GridSearchCV(RandomForestRegressor(random_state=rand_state), \
-                        param_grid,scoring='%s' % score,cv=5,n_jobs=4)
+                        param_grid,scoring='%s' % score,cv=5,n_jobs=2)
 
         reg.fit(X_train, y_train)
 
@@ -57,9 +55,21 @@ def rf_reg_grid_search(df,features,label,param_grid,rand_state,scores):
         print()
         print("Grid scores on training set:")
         print()
-        for params, mean_score, scores in reg.grid_scores_:
-            print("%0.6f (+/-%0.06f) for %r"
-                  % (mean_score, scores.std() * 2, params))
+        means = reg.cv_results_['mean_test_score']
+        stds = reg.cv_results_['std_test_score']
+        for mean, std, params in zip(means, stds, reg.cv_results_['params']):
+            print("%0.3f (+/-%0.03f) for %r"
+                % (mean, std * 2, params))
+        print()
+        df = pd.DataFrame(reg.cv_results_)
+        df.to_hdf('gridsearch_'+name+'_'+score+'.hdf5','data')
+        print()
+        print("The model is trained on the full development set.")
+        print("The scores are computed on the full evaluation set.")
+        print()
+        y_true, y_pred = y_test, reg.predict(X_test)
+        ml_an.evaluate_regression(y_test,y_pred)
+        pz_an.evaluate_photoz(y_test,y_pred)
         print()
 
 
