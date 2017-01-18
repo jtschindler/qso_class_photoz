@@ -50,10 +50,10 @@ def grid_search_example():
     label = 'Z'
     rand_state = 1
     param_grid = [{'C': [1, 10], 'gamma': [0.0001], \
-                'kernel': ['rbf','linear']}]
+                'kernel': ('rbf','linear')}]
     scores = ['mean_absolute_error','mean_squared_error','r2',]
 
-    svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores)
+    svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'example')
 
 
 def test_example():
@@ -63,7 +63,7 @@ def test_example():
     df_train = pd.read_hdf('../class_photoz/data/DR7DR14Q_flux_cat.hdf5','data')
 
     # Try a fraction of the whole datafile first
-    df_train = df_train.sample(frac=0.05)
+    df_train = df_train.sample(frac=0.1)
 
     passband_names = [\
             'SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \

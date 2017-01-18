@@ -35,6 +35,9 @@ def rf_reg_grid_search(df,features,label,param_grid,rand_state,scores,name):
 
     X,y = sets.build_matrices(df, features,label)
 
+    # Standardizing the data
+    X = preprocessing.robust_scale(X)
+
     X_train, X_test, y_train, y_test = train_test_split(
         X,y, test_size=0.2,random_state=rand_state)
 
@@ -45,7 +48,7 @@ def rf_reg_grid_search(df,features,label,param_grid,rand_state,scores,name):
         print()
 
         reg = GridSearchCV(RandomForestRegressor(random_state=rand_state), \
-                        param_grid,scoring='%s' % score,cv=5,n_jobs=2)
+                        param_grid,scoring='%s' % score,cv=5,n_jobs=3)
 
         reg.fit(X_train, y_train)
 
@@ -62,7 +65,7 @@ def rf_reg_grid_search(df,features,label,param_grid,rand_state,scores,name):
                 % (mean, std * 2, params))
         print()
         df = pd.DataFrame(reg.cv_results_)
-        df.to_hdf('gridsearch_'+name+'_'+score+'.hdf5','data')
+        df.to_hdf('RF_GS_'+name+'_'+score+'.hdf5','data')
         print()
         print("The model is trained on the full development set.")
         print("The scores are computed on the full evaluation set.")
@@ -97,9 +100,9 @@ def rf_reg_example(df,features,label,params,rand_state):
     # Building test and training sample
     X,y = sets.build_matrices(df, features, label)
 
-    # Standardizing the data -> Does not do much!
-    # X = preprocessing.scale(X)
-    # X = preprocessing.robust_scale(X)
+    # Standardizing the data
+    X = preprocessing.robust_scale(X)
+
 
     X_train, X_test, y_train, y_test = train_test_split(
         X,y, test_size=0.2, random_state=rand_state)
@@ -210,6 +213,10 @@ def rf_reg_predict(train_set, pred_set, features, label, params, pred_label):
     train_X, train_y = sets.build_matrices(train_set, features, label)
 
     pred_X = sets.build_matrix(pred_set, features)
+
+    # Standardizing the data
+    train_X = preprocessing.robust_scale(train_X)
+    pred_X = preprocessing.robust_scale(pred_X)
 
     # Random Forest Regression
     reg = RandomForestRegressor(**params)

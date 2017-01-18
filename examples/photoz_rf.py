@@ -50,7 +50,7 @@ def grid_search_example():
 
 
 
-    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'test')
+    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'example')
 
 def test_example():
     # --------------------------------------------------------------------------
