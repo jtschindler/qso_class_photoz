@@ -34,8 +34,8 @@ def DR7DR14_grid_search():
 
     label = 'Z'
     rand_state = 1
-    param_grid = [{'C': [10], 'gamma': [0.1], \
-                'kernel': ['rbf']}]
+    param_grid = [{'C': [10,1.0,0.1], 'gamma': [0.01,0.1,1.0], \
+                'kernel': ['rbf'],'epsilon':[0.1,0.2,0.3]}]
 
     # --------------------------------------------------------------------------
     # Preparation of training set
@@ -78,7 +78,7 @@ def DR7DR14_grid_search():
 
     features = ['SDSS_i','ug','gr','ri','iz']
 
-    svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR14_SDSS5a')
+    # svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR14_SDSS5a')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -101,7 +101,7 @@ def DR7DR14_grid_search():
 
     features = ['SDSS_i','ug','gr','ri','iz']
 
-    svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR14_SDSS5b')
+    # svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR14_SDSS5b')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -240,7 +240,7 @@ def test_example():
     label = 'Z'
     rand_state = 1
 
-    params = {'kernel':'rbf','C':1.0, 'gamma':0.1, 'epsilon':0.2,'cache_size':1200}
+    params = {'kernel':'rbf','C':10, 'gamma':0.1, 'epsilon':0.1,'cache_size':1200}
 
 
     svr.svm_reg_example(df_train,features,label,params,rand_state)
@@ -299,8 +299,8 @@ def predict_example():
 
 
 
-# test_example()
+test_example()
 # simqsos_grid_search()
-DR7DR14_grid_search()
+# DR7DR14_grid_search()
 # grid_search_example()
 # predict_example()

@@ -22,7 +22,7 @@ def DR7DR14_grid_search():
     # Read data file and input parameters
     # --------------------------------------------------------------------------
     df = pd.read_hdf('../class_photoz/data/DR7DR14Q_flux_cat.hdf5','data')
-    df = df.sample(frac=0.1)
+    df = df.sample(frac=0.05)
     df.replace(np.inf, np.nan,inplace=True)
 
     # scores = ['neg_mean_absolute_error','neg_mean_squared_error','r2',]
@@ -30,8 +30,8 @@ def DR7DR14_grid_search():
 
     label = 'Z'
     rand_state = 1
-    param_grid = [{'n_estimators': [25,50,100], 'min_samples_split': [2,3], \
-                     'max_depth' : [20]} ]
+    param_grid = [{'n_estimators': [25,50,100,200], 'min_samples_split': [2,3,4], \
+                     'max_depth' : [15,20,25]} ]
 
     # --------------------------------------------------------------------------
     # Preparation of training set
@@ -105,9 +105,6 @@ def DR7DR14_grid_search():
 
 
 
-
-
-
 def simqsos_grid_search():
     # --------------------------------------------------------------------------
     # Read data file and input parameters
@@ -121,11 +118,11 @@ def simqsos_grid_search():
 
     label = 'z'
     rand_state = 1
-    param_grid = [{'n_estimators': [25,50], 'min_samples_split': [2,3], \
-                     'max_depth' : [15,]} ]
+    param_grid = [{'n_estimators': [10,25,50,100,200,300], 'min_samples_split': [2,3,4], \
+                     'max_depth' : [15,20,25]} ]
     # scores = ['neg_mean_absolute_error','neg_mean_squared_error','r2',]
-    scores = ['neg_mean_absolute_error']
-    params = {'cv':5,'n_jobs':2}
+    scores = ['r2']
+
 
     df.replace(np.inf, np.nan,inplace=True)
 
@@ -153,7 +150,7 @@ def simqsos_grid_search():
 
     features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
 
-    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'simqsos')
+    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'simqsos_SDSS5W1W2')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -182,7 +179,7 @@ def simqsos_grid_search():
 
     features = ['SDSS_i','ug','gr','ri','iz']
 
-    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'simqsos')
+    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'simqsos_SDSS5a')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -212,7 +209,7 @@ def simqsos_grid_search():
 
     features = ['SDSS_i','WISE_w1','TMASS_j','ug','gr','ri','iz','zj','jh','hks','ksw1','w1w2']
 
-    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'simqsos')
+    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'simqsos_SDSS5b')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -248,7 +245,7 @@ def test_example():
     label = 'Z'
     rand_state = 1
 
-    params = {'n_estimators': 50, 'max_depth': 25, 'min_samples_split': 2, 'n_jobs': 2, 'random_state':rand_state}
+    params = {'n_estimators': 200, 'max_depth': 20, 'min_samples_split': 4, 'n_jobs': 2, 'random_state':rand_state}
 
 
     rf.rf_reg_example(df_train,features,label,params,rand_state)
@@ -305,6 +302,6 @@ def predict_example():
     plt.show()
 
 
-DR7DR14_grid_search()
-
+# DR7DR14_grid_search()
+test_example()
 # simqsos_grid_search()
