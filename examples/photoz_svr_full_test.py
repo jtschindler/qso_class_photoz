@@ -25,14 +25,16 @@ def DR7DR14_grid_search():
     # --------------------------------------------------------------------------
     # Read data file and input parameters
     # --------------------------------------------------------------------------
-    df = pd.read_hdf('../class_photoz/data/DR7DR14Q_flux_cat.hdf5','data')
+    df = pd.read_hdf('../class_photoz/data/DR7DR14Q_clean_flux_cat.hdf5','data')
+
+    df = df.query('0 < Z_VI < 10')
     df = df.sample(frac=0.05)
     df.replace(np.inf, np.nan,inplace=True)
 
     # scores = ['neg_mean_absolute_error','neg_mean_squared_error','r2',]
     scores = ['r2']
 
-    label = 'Z'
+    label = 'Z_VI'
     rand_state = 1
     param_grid = [{'C': [10,1.0,0.1], 'gamma': [0.01,0.1,1.0], \
                 'kernel': ['rbf'],'epsilon':[0.1,0.2,0.3]}]
@@ -78,7 +80,7 @@ def DR7DR14_grid_search():
 
     features = ['SDSS_i','ug','gr','ri','iz']
 
-    # svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR14_SDSS5a')
+    svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR14_SDSS5a')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -101,7 +103,7 @@ def DR7DR14_grid_search():
 
     features = ['SDSS_i','ug','gr','ri','iz']
 
-    # svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR14_SDSS5b')
+    svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR14_SDSS5b')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -216,10 +218,10 @@ def test_example():
     # --------------------------------------------------------------------------
     # Preparing the feature matrix
     # --------------------------------------------------------------------------
-    df_train = pd.read_hdf('../class_photoz/data/DR7DR14Q_flux_cat.hdf5','data')
-
+    # df_train = pd.read_hdf('../class_photoz/data/DR7DR14Q_clean_flux_cat.hdf5','data')
+    df_train = pd.read_hdf('../class_photoz/data/brightqsos_deep.hdf5','data')
     # Try a fraction of the whole datafile first
-    df_train = df_train.sample(frac=0.3)
+    df_train = df_train.sample(frac=0.5)
 
     passband_names = [\
             'SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
@@ -227,6 +229,11 @@ def test_example():
             'WISE_w1','WISE_w2', \
             # 'WISE_w3' \
             ]
+
+    for name in passband_names:
+        df_train.rename(columns={'obsFlux_'+name:name},inplace=True)
+        df_train.rename(columns={'obsFluxErr_'+name:'sigma_'+name},inplace=True)
+
 
     df_train.replace(np.inf, np.nan,inplace=True)
 
@@ -237,7 +244,7 @@ def test_example():
     # --------------------------------------------------------------------------
 
     features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
-    label = 'Z'
+    label = 'z'
     rand_state = 1
 
     params = {'kernel':'rbf','C':10, 'gamma':0.1, 'epsilon':0.1,'cache_size':1200}
@@ -252,20 +259,22 @@ def predict_example():
     # --------------------------------------------------------------------------
     # Preparing the feature matrix
     # --------------------------------------------------------------------------
-    df_test = pd.read_hdf('../class_photoz/data/DR7DR14Q_flux_cat.hdf5','data')
+    df_test = pd.read_hdf('../class_photoz/data/DR7DR14Q_clean_flux_cat.hdf5','data')
     # df_train = pd.read_hdf('../class_photoz/data/DR7DR14Q_flux_cat.hdf5','data')
-    df_train = pd.read_hdf('../class_photoz/data/brightqsos_2.hdf5','data')
+    df_train = pd.read_hdf('../class_photoz/data/brightqsos_try.hdf5','data')
     passband_names = [\
             'SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
-            # 'TMASS_j','TMASS_h','TMASS_ks', \
+            # 'TMASS_j','TMASS_h','TMASS_k', \
             'WISE_w1','WISE_w2', \
             # 'WISE_w3' \
             ]
     # Try a fraction of the whole datafile first
-    df_train = df_train.sample(frac=1.0)
+    df_train = df_train.sample(frac=0.2)
 
     # df_test.query('Z > 1.1',inplace=True)
     # df_train.query('z > 1.1',inplace=True)
+    df_test.query('2.0 > Z_VI > 0.2 ',inplace=True)
+    df_train.query('2.0 > z > 0.2',inplace=True)
 
     for name in passband_names:
         df_train.rename(columns={'obsFlux_'+name:name},inplace=True)
@@ -284,7 +293,7 @@ def predict_example():
     # --------------------------------------------------------------------------
 
     features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
-    # features = ['SDSS_i','WISE_w1','TMASS_j','ug','gr','ri','iz','zj','jh', 'hks', 'ksw1', 'w1w2']
+    # features = ['SDSS_i','WISE_w1','TMASS_j','ug','gr','ri','iz','zj','jh', 'hk', 'kw1', 'w1w2']
     label = 'z'
 
 
@@ -292,9 +301,9 @@ def predict_example():
 
     df_test = svr.svm_reg_predict(df_train, df_test, features, label, params, 'svm_photoz')
     print df_test['svm_photoz'].describe()
-    ml_an.evaluate_regression(df_test['Z'],df_test['svm_photoz'])
-    pz_an.plot_redshifts(df_test['Z'],df_test['svm_photoz'])
-    pz_an.plot_error_hist(df_test['Z'],df_test['svm_photoz'])
+    ml_an.evaluate_regression(df_test['Z_VI'],df_test['svm_photoz'])
+    pz_an.plot_redshifts(df_test['Z_VI'],df_test['svm_photoz'])
+    pz_an.plot_error_hist(df_test['Z_VI'],df_test['svm_photoz'])
     plt.show()
 
 

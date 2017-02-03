@@ -17,21 +17,26 @@ from class_photoz import rf_reg as rf
 from class_photoz import ml_analysis as ml_an
 from class_photoz import photoz_analysis as pz_an
 
-def DR7DR14_grid_search():
+def DR7DR12_grid_search():
     # --------------------------------------------------------------------------
     # Read data file and input parameters
     # --------------------------------------------------------------------------
-    df = pd.read_hdf('../class_photoz/data/DR7DR14Q_flux_cat.hdf5','data')
-    df = df.sample(frac=0.05)
+    df = pd.read_hdf('../class_photoz/data/DR7DR12Q_clean_flux_cat.hdf5','data')
+
+    df = df.query('0 < Z_VI < 10')
+
     df.replace(np.inf, np.nan,inplace=True)
 
     # scores = ['neg_mean_absolute_error','neg_mean_squared_error','r2',]
     scores = ['r2']
 
-    label = 'Z'
+    label = 'Z_VI'
     rand_state = 1
-    param_grid = [{'n_estimators': [25,50,100,200], 'min_samples_split': [2,3,4], \
+    param_grid = [{'n_estimators': [50,100,200,300], 'min_samples_split': [2,3,4], \
                      'max_depth' : [15,20,25]} ]
+
+    # param_grid = [{'n_estimators': [200], 'min_samples_split': [4], \
+    #                  'max_depth' : [15]} ]
 
     # --------------------------------------------------------------------------
     # Preparation of training set
@@ -44,14 +49,14 @@ def DR7DR14_grid_search():
             ]
     df_train = df.copy(deep=True)
     df_train,features = qs.prepare_flux_ratio_catalog(df_train,passband_names)
-
+    # df_train = df_train.sample(frac=0.5)
     # --------------------------------------------------------------------------
     # Random Forest Regression Grid Search
     # --------------------------------------------------------------------------
 
     features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
 
-    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR14_SDSS5W1W2')
+    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR12_SDSS5W1W2')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -74,7 +79,7 @@ def DR7DR14_grid_search():
 
     features = ['SDSS_i','ug','gr','ri','iz']
 
-    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR14_SDSS5a')
+    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR12_SDSS5a')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -97,12 +102,82 @@ def DR7DR14_grid_search():
 
     features = ['SDSS_i','ug','gr','ri','iz']
 
-    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR14_SDSS5b')
+    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR12_SDSS5b')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
 
+    # --------------------------------------------------------------------------
+    # Preparation of training set
+    # --------------------------------------------------------------------------
+    passband_names = [\
+            'SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
+            # 'TMASS_j','TMASS_h','TMASS_k', \
+            'WISE_w1','WISE_w2', \
+            # 'WISE_w3' \
+            ]
+    df_train = df.copy(deep=True)
+    df_train.query('PSFMAG_I < 18.5',inplace=True)
+    df_train,features = qs.prepare_flux_ratio_catalog(df_train,passband_names)
 
+    # --------------------------------------------------------------------------
+    # Random Forest Regression Grid Search
+    # --------------------------------------------------------------------------
+
+    features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
+
+    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR12_SDSS5W1W2_icut')
+
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Preparation of training set
+    # --------------------------------------------------------------------------
+    passband_names = [\
+            'SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
+            # 'TMASS_j','TMASS_h','TMASS_k', \
+            # 'WISE_w1','WISE_w2', \
+            # 'WISE_w3' \
+            ]
+    df_train = df.copy(deep=True)
+    df_train.query('PSFMAG_I < 18.5',inplace=True)
+    df_train,features = qs.prepare_flux_ratio_catalog(df_train,passband_names)
+
+    # --------------------------------------------------------------------------
+    # Random Forest Regression Grid Search
+    # --------------------------------------------------------------------------
+
+    features = ['SDSS_i','ug','gr','ri','iz']
+
+    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR12_SDSS5b_icut')
+
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Preparation of training set
+    # --------------------------------------------------------------------------
+    passband_names = [\
+            'SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
+            # 'TMASS_j','TMASS_h','TMASS_k', \
+            'WISE_w1','WISE_w2', \
+            # 'WISE_w3' \
+            ]
+    df_train = df.copy(deep=True)
+    df_train.query('PSFMAG_I < 18.5',inplace=True)
+    df_train,features = qs.prepare_flux_ratio_catalog(df_train,passband_names)
+
+    # --------------------------------------------------------------------------
+    # Random Forest Regression Grid Search
+    # --------------------------------------------------------------------------
+
+    features = ['SDSS_i','ug','gr','ri','iz']
+
+    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR12_SDSS5a_icut')
+
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
 
 def simqsos_grid_search():
@@ -110,15 +185,15 @@ def simqsos_grid_search():
     # Read data file and input parameters
     # --------------------------------------------------------------------------
 
-    df = pd.read_hdf('../class_photoz/data/brightqsos_2.hdf5','data')
+    df = pd.read_hdf('../class_photoz/data/brightqsos_sim_2k.hdf5','data')
 
-    df = df.sample(frac=0.1)
+    # df = df.sample(frac=0.1)
 
 
 
     label = 'z'
     rand_state = 1
-    param_grid = [{'n_estimators': [10,25,50,100,200,300], 'min_samples_split': [2,3,4], \
+    param_grid = [{'n_estimators': [50,100,200,300], 'min_samples_split': [2,3,4], \
                      'max_depth' : [15,20,25]} ]
     # scores = ['neg_mean_absolute_error','neg_mean_squared_error','r2',]
     scores = ['r2']
@@ -190,31 +265,91 @@ def simqsos_grid_search():
     # --------------------------------------------------------------------------
     passband_names = [\
             'SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
-            'TMASS_j','TMASS_h','TMASS_ks', \
+            # 'TMASS_j','TMASS_h','TMASS_k', \
             'WISE_w1','WISE_w2', \
             # 'WISE_w3' \
             ]
-
     df_train = df.copy(deep=True)
 
     for name in passband_names:
         df_train.rename(columns={'obsFlux_'+name:name},inplace=True)
         df_train.rename(columns={'obsFluxErr_'+name:'sigma_'+name},inplace=True)
 
+    df_train.query('PSFMAG_I < 18.5',inplace=True)
     df_train,features = qs.prepare_flux_ratio_catalog(df_train,passband_names)
 
     # --------------------------------------------------------------------------
     # Random Forest Regression Grid Search
     # --------------------------------------------------------------------------
 
-    features = ['SDSS_i','WISE_w1','TMASS_j','ug','gr','ri','iz','zj','jh','hks','ksw1','w1w2']
+    features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
 
-    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'simqsos_SDSS5b')
+    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'simqsos_SDSS5W1W2_icut')
+
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Preparation of training set
+    # --------------------------------------------------------------------------
+    passband_names = [\
+            'SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
+            # 'TMASS_j','TMASS_h','TMASS_k', \
+            'WISE_w1','WISE_w2', \
+            # 'WISE_w3' \
+            ]
+    df_train = df.copy(deep=True)
+
+    for name in passband_names:
+        df_train.rename(columns={'obsFlux_'+name:name},inplace=True)
+        df_train.rename(columns={'obsFluxErr_'+name:'sigma_'+name},inplace=True)
+
+    df_train.query('PSFMAG_I < 18.5',inplace=True)
+    df_train,features = qs.prepare_flux_ratio_catalog(df_train,passband_names)
+
+    # --------------------------------------------------------------------------
+    # Random Forest Regression Grid Search
+    # --------------------------------------------------------------------------
+
+    features = ['SDSS_i','ug','gr','ri','iz']
+
+    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'simqsos_SDSS5_icut')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
 
 
+    # --------------------------------------------------------------------------
+    # Preparation of training set
+    # --------------------------------------------------------------------------
+    passband_names = [\
+            'SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
+            # 'TMASS_j','TMASS_h','TMASS_k', \
+            'WISE_w1','WISE_w2', \
+            # 'WISE_w3' \
+            ]
+    df_train = df.copy(deep=True)
+
+    for name in passband_names:
+        df_train.rename(columns={'obsFlux_'+name:name},inplace=True)
+        df_train.rename(columns={'obsFluxErr_'+name:'sigma_'+name},inplace=True)
+
+    df_train.query('PSFMAG_I < 18.5',inplace=True)
+    df_train['ls'] = df_train.obsMag_TMASS_k+1.84-df_train.obsMag_WISE_w2-3.339
+    df_train['rs'] = df_train.obsMag_TMASS_j+0.894-df_train.obsMag_TMASS_k-1.84
+    df_train.query('ls >= rs',inplace=True)
+    df_train,features = qs.prepare_flux_ratio_catalog(df_train,passband_names)
+
+    # --------------------------------------------------------------------------
+    # Random Forest Regression Grid Search
+    # --------------------------------------------------------------------------
+
+    features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
+
+    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'simqsos_SDSS5W1W2_icut_colorcut')
+
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
 
 
@@ -279,15 +414,16 @@ def predict_example():
     df_test.replace(np.inf, np.nan,inplace=True)
     df_train.replace(np.inf, np.nan,inplace=True)
 
-    df_test,features = qs.prepare_flux_ratio_catalog(df_test,passband_names)
-    df_train,features = qs.prepare_flux_ratio_catalog(df_train,passband_names)
+    # df_test,features = qs.prepare_flux_ratio_catalog(df_test,passband_names)
+    # df_train,features = qs.prepare_flux_ratio_catalog(df_train,passband_names)
 
     print df_test.shape, df_train.shape
     # --------------------------------------------------------------------------
     # Random Forest Regression Grid Search
     # --------------------------------------------------------------------------
 
-    features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
+    features = ['SDSS_u','SDSS_i','SDSS_r','SDSS_z','SDSS_g','WISE_w1','WISE_w2']
+    # features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
     # features = ['SDSS_i','WISE_w1','TMASS_j','ug','gr','ri','iz','zj','jh', 'hks', 'ksw1', 'w1w2']
     label = 'z'
     rand_state = 1
@@ -302,6 +438,6 @@ def predict_example():
     plt.show()
 
 
-# DR7DR14_grid_search()
-test_example()
-# simqsos_grid_search()
+# DR7DR12_grid_search()
+# test_example()
+simqsos_grid_search()

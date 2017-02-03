@@ -36,6 +36,16 @@ def svm_reg_grid_search(df,features,label,param_grid,rand_state,scores,name):
             param_grid : dictionary-like structure
             Parameter grid of input parameters for the grid search
 
+            rand_state : integer
+            Setting the random state variables to ensure reproducibility
+
+            scores : list of strings
+            Setting the score by which the grid search should be evaluated
+
+            name : strings
+            Setting the name of the output file for the grid search which
+            contains all information about the grid
+
     """
 
     X,y = sets.build_matrices(df, features,label)
@@ -46,14 +56,15 @@ def svm_reg_grid_search(df,features,label,param_grid,rand_state,scores,name):
     X_train, X_test, y_train, y_test = train_test_split(
         X,y, test_size=0.2,random_state=rand_state)
 
-    print X_train.shape, X_test.shape
+    print "Training sample size: ", X_train.shape
+    print "Evaluation sample size: ", X_test.shape
 
     for score in scores:
         print("# Tuning hyper-parameters for %s" % score)
         print()
 
         reg = GridSearchCV(SVR(), \
-                        param_grid,scoring='%s' % score,cv=5,n_jobs=3)
+                        param_grid,scoring='%s' % score,cv=5,n_jobs=4)
 
         reg.fit(X_train, y_train)
 
@@ -72,8 +83,8 @@ def svm_reg_grid_search(df,features,label,param_grid,rand_state,scores,name):
         df = pd.DataFrame(reg.cv_results_)
         df.to_hdf('SVR_GS_'+name+'_'+score+'.hdf5','data')
         print()
-        print("The model is trained on the full development set.")
-        print("The scores are computed on the full evaluation set.")
+        print("The model is trained on the full development set (80%).")
+        print("The scores are computed on the full evaluation set (20%).")
         print()
         y_true, y_pred = y_test, reg.predict(X_test)
         ml_an.evaluate_regression(y_test,y_pred)
@@ -98,6 +109,10 @@ def svm_reg_example(df,features,label,params,rand_state):
 
             params : dictionary
             List of input parameters for the regression
+
+            rand_state : integer
+            Setting the random state variables to ensure reproducibility
+
 
     """
 
