@@ -152,7 +152,7 @@ def rf_class_example(df, features, label, params):
         print str(features[i])+": "+str(feat_importances[i])
     print "\n"
 
-    ml_an.plot_roc_curve(y_true, y_pred_proba, pos_label="QSO")
+    ml_an.plot_roc_curve(y_true, y_pred_proba, pos_label="highz")
 
     plt.show()
 

@@ -335,9 +335,9 @@ def simqsos_grid_search():
         df_train.rename(columns={'obsFluxErr_'+name:'sigma_'+name},inplace=True)
 
     df_train.query('obsMag_SDSS_i < 18.5',inplace=True)
-    df_train['ls'] = df_train.obsMag_TMASS_k+1.84-df_train.obsMag_WISE_w2-3.339
-    df_train['rs'] = df_train.obsMag_TMASS_j+0.894-df_train.obsMag_TMASS_k-1.84
-    df_train.query('ls >= rs',inplace=True)
+    df_train['kw2'] = df_train.obsMag_TMASS_k-df_train.obsMag_WISE_w2
+    df_train['jk'] = df_train.obsMag_TMASS_j-df_train.obsMag_TMASS_k
+    df_train.query('kw2 >= -0.501208-0.848*jk',inplace=True)
     df_train,features = qs.prepare_flux_ratio_catalog(df_train,passband_names)
 
     # --------------------------------------------------------------------------

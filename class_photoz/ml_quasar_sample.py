@@ -20,7 +20,7 @@ def prepare_flux_ratio_catalog(df,passband_names,sigma=False):
 
     # Drop all rows with NaN values in the passband considered
     df.dropna(axis=0,how='any',subset=passband_names,inplace=True)
-
+    
 
     # Calculate the flux ratios and add them to the dataframe
     flux_ratio_names = []
