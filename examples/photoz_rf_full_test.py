@@ -225,7 +225,7 @@ def simqsos_grid_search():
 
     features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
 
-    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'simqsos_SDSS5W1W2')
+    # rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'simqsos_SDSS5W1W2')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -254,7 +254,7 @@ def simqsos_grid_search():
 
     features = ['SDSS_i','ug','gr','ri','iz']
 
-    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'simqsos_SDSS5a')
+    # rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'simqsos_SDSS5a')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -284,7 +284,7 @@ def simqsos_grid_search():
 
     features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
 
-    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'simqsos_SDSS5W1W2_icut')
+    # rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'simqsos_SDSS5W1W2_icut')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -313,7 +313,7 @@ def simqsos_grid_search():
 
     features = ['SDSS_i','ug','gr','ri','iz']
 
-    rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'simqsos_SDSS5_icut')
+    # rf.rf_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'simqsos_SDSS5_icut')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
