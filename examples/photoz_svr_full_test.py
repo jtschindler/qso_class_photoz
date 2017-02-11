@@ -6,11 +6,9 @@ import matplotlib.pyplot as plt
 
 from sklearn import preprocessing, cross_validation
 
-from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.svm import SVR
-from sklearn.grid_search import GridSearchCV
-from sklearn.cross_validation import train_test_split
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV
 
 
 from class_photoz import ml_sets as sets
@@ -21,14 +19,14 @@ from class_photoz import ml_analysis as ml_an
 from class_photoz import photoz_analysis as pz_an
 
 
-def DR7DR14_grid_search():
+def DR7DR12_grid_search():
     # --------------------------------------------------------------------------
     # Read data file and input parameters
     # --------------------------------------------------------------------------
-    df = pd.read_hdf('../class_photoz/data/DR7DR14Q_clean_flux_cat.hdf5','data')
+    df = pd.read_hdf('../class_photoz/data/DR7DR12Q_clean_flux_cat.hdf5','data')
 
     df = df.query('0 < Z_VI < 10')
-    df = df.sample(frac=0.05)
+    
     df.replace(np.inf, np.nan,inplace=True)
 
     # scores = ['neg_mean_absolute_error','neg_mean_squared_error','r2',]
@@ -57,7 +55,7 @@ def DR7DR14_grid_search():
 
     features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
 
-    svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR14_SDSS5W1W2')
+    svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR12_SDSS5W1W2')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -80,7 +78,7 @@ def DR7DR14_grid_search():
 
     features = ['SDSS_i','ug','gr','ri','iz']
 
-    svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR14_SDSS5a')
+    svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR12_SDSS5a')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -103,17 +101,65 @@ def DR7DR14_grid_search():
 
     features = ['SDSS_i','ug','gr','ri','iz']
 
-    svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR14_SDSS5b')
+    svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR12_SDSS5b')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
+    
+    # --------------------------------------------------------------------------
+    # Preparation of training set
+    # --------------------------------------------------------------------------
+    passband_names = [\
+            'SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
+            # 'TMASS_j','TMASS_h','TMASS_k', \
+            'WISE_w1','WISE_w2', \
+            # 'WISE_w3' \
+            ]
+    df_train = df.copy(deep=True)
+    df_train.query('PSFMAG_I < 18.5',inplace=True)
+    df_train,features = qs.prepare_flux_ratio_catalog(df_train,passband_names)
+
+    # --------------------------------------------------------------------------
+    # Random Forest Regression Grid Search
+    # --------------------------------------------------------------------------
+
+    features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
+
+    svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR12_SDSS5W1W2_icut')
+
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    
+    # --------------------------------------------------------------------------
+    # Preparation of training set
+    # --------------------------------------------------------------------------
+    passband_names = [\
+            'SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
+            # 'TMASS_j','TMASS_h','TMASS_k', \
+            # 'WISE_w1','WISE_w2', \
+            # 'WISE_w3' \
+            ]
+    df_train = df.copy(deep=True)
+    df_train.query('PSFMAG_I < 18.5',inplace=True)
+    df_train,features = qs.prepare_flux_ratio_catalog(df_train,passband_names)
+
+       # --------------------------------------------------------------------------
+    # Random Forest Regression Grid Search
+    # --------------------------------------------------------------------------
+
+    features = ['SDSS_i','ug','gr','ri','iz']
+
+    svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR12_SDSS5b_icut')
+
+    
+
 
 def simqsos_grid_search():
     # --------------------------------------------------------------------------
     # Read data file and input parameters
     # --------------------------------------------------------------------------
 
-    df = pd.read_hdf('../class_photoz/data/brightqsos_2.hdf5','data')
+    df = pd.read_hdf('../class_photoz/data/brightqsos_sim_2k_new.hdf5','data')
 
     df = df.sample(frac=0.1)
 
@@ -308,8 +354,8 @@ def predict_example():
 
 
 
-test_example()
+#test_example()
 # simqsos_grid_search()
-# DR7DR14_grid_search()
+DR7DR12_grid_search()
 # grid_search_example()
 # predict_example()

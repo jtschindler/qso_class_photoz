@@ -185,7 +185,7 @@ def simqsos_grid_search():
     # Read data file and input parameters
     # --------------------------------------------------------------------------
 
-    df = pd.read_hdf('../class_photoz/data/brightqsos_sim_2k.hdf5','data')
+    df = pd.read_hdf('../class_photoz/data/brightqsos_sim_2k_new.hdf5','data')
 
     # df = df.sample(frac=0.1)
 
@@ -275,7 +275,7 @@ def simqsos_grid_search():
         df_train.rename(columns={'obsFlux_'+name:name},inplace=True)
         df_train.rename(columns={'obsFluxErr_'+name:'sigma_'+name},inplace=True)
 
-    df_train.query('PSFMAG_I < 18.5',inplace=True)
+    df_train.query('obsMag_SDSS_i < 18.5',inplace=True)
     df_train,features = qs.prepare_flux_ratio_catalog(df_train,passband_names)
 
     # --------------------------------------------------------------------------
@@ -304,7 +304,7 @@ def simqsos_grid_search():
         df_train.rename(columns={'obsFlux_'+name:name},inplace=True)
         df_train.rename(columns={'obsFluxErr_'+name:'sigma_'+name},inplace=True)
 
-    df_train.query('PSFMAG_I < 18.5',inplace=True)
+    df_train.query('obsMag_SDSS_i < 18.5',inplace=True)
     df_train,features = qs.prepare_flux_ratio_catalog(df_train,passband_names)
 
     # --------------------------------------------------------------------------
@@ -334,7 +334,7 @@ def simqsos_grid_search():
         df_train.rename(columns={'obsFlux_'+name:name},inplace=True)
         df_train.rename(columns={'obsFluxErr_'+name:'sigma_'+name},inplace=True)
 
-    df_train.query('PSFMAG_I < 18.5',inplace=True)
+    df_train.query('obsMag_SDSS_i < 18.5',inplace=True)
     df_train['ls'] = df_train.obsMag_TMASS_k+1.84-df_train.obsMag_WISE_w2-3.339
     df_train['rs'] = df_train.obsMag_TMASS_j+0.894-df_train.obsMag_TMASS_k-1.84
     df_train.query('ls >= rs',inplace=True)
