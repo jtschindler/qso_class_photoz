@@ -8,6 +8,7 @@ from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import classification_report
 from sklearn.learning_curve import validation_curve
 from sklearn.learning_curve import learning_curve
+from sklearn.metrics import confusion_matrix
 
 from sklearn.ensemble import RandomForestClassifier
 
@@ -137,10 +138,20 @@ def rf_class_example(df, features, label, params):
     clf.fit(X_train,y_train)
 
     y_true, y_pred = y_test, clf.predict(X_test)
-    y_pred_proba = clf.predict_proba(X_test)[:, 0]
 
-    ml_an.plot_precision_recall_curve(y_true,y_pred_proba,pos_label="QSO")
-    plt.show()
+    # Confusion matrix
+    class_names = clf.classes_
+    cnf_matrix = confusion_matrix(y_true, y_pred, labels=None, sample_weight=None)
+    plt.figure()
+
+    ml_an.plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=True,
+                      title='Confusion matrix, with normalization')
+
+
+    # y_pred_proba = clf.predict_proba(X_test)[:, 0]
+
+    # ml_an.plot_precision_recall_curve(y_true,y_pred_proba,pos_label="QSO")
+    # plt.show()
 
     feat_importances = clf.feature_importances_
 
@@ -152,7 +163,7 @@ def rf_class_example(df, features, label, params):
         print str(features[i])+": "+str(feat_importances[i])
     print "\n"
 
-    ml_an.plot_roc_curve(y_true, y_pred_proba, pos_label="highz")
+    # ml_an.plot_roc_curve(y_true, y_pred_proba, pos_label="highz")
 
     plt.show()
 

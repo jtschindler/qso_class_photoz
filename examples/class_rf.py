@@ -7,19 +7,31 @@ from class_photoz import ml_sets as sets
 from class_photoz import rf_class as rf_class
 
 
-def create_labels(df_stars, df_quasars):
+def create_labels(df_stars, df_quasars,z_label):
 
     df_stars['class_label'] = df_stars.star_class
 
+    star_labels = df_stars.class_label.value_counts().index
+
+    for label in star_labels:
+
+        if df_stars.class_label.value_counts()[label] < 10:
+            df_stars.drop(df_stars.query('class_label == "'+label+'"').index,
+                                                                inplace=True)
+
+
+
+
+
     lowz=[0,1,2,3]
-    highz=[1,2,3,6]
+    highz=[1,2,3,10]
     labels=['vlowz','lowz','midz','highz']
     df_quasars['class_label'] = 'null'
-
+    df_quasars.query('0<'+str(z_label)+'<10',inplace=True)
     for idx in range(len(lowz)):
 
         df_quasars.loc[
-                df_quasars.query(str(lowz[idx])+'<z<'+str(highz[idx])).index, \
+                df_quasars.query(str(lowz[idx])+'<'+z_label+'<'+str(highz[idx])).index, \
                 'class_label'] = labels[idx]
 
     print df_quasars.class_label.value_counts()
@@ -82,8 +94,8 @@ def grid_search_example():
 def test_example():
 
     df_stars = pd.read_hdf('../class_photoz/data/DR13_stars_fluxcat.hdf5','data')
-    # df_quasars = pd.read_hdf('../class_photoz/data/DR7DR12Q_clean_flux_cat.hdf5','data')
-    df_quasars = pd.read_hdf('../class_photoz/data/brightqsos_sim_2k_new.hdf5','data')
+    df_quasars = pd.read_hdf('../class_photoz/data/DR7DR12Q_clean_flux_cat.hdf5','data')
+    # df_quasars = pd.read_hdf('../class_photoz/data/brightqsos_sim_2k_new.hdf5','data')
 
     passband_names = ['SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
                         'TMASS_j', \
@@ -125,25 +137,31 @@ def test_example():
     # df_quasars['jk'] = df_quasars.obsMag_TMASS_j-df_quasars.obsMag_TMASS_k
     # df_quasars.query('kw2 >= -0.501208-0.848*jk',inplace=True)
     #
-    # df_stars['kw2'] = df_stars.TMASS_mag_k-df_stars.WISE_mag_w2
-    # df_stars['jk'] = df_stars.TMASS_mag_j-df_stars.TMASS_mag_k
-    # print df_stars.shape
-    # print df_stars.query('kw2 >= 1.8-0.848*jk').shape
-    # df_stars.query('kw2 >= 1.8-0.848*jk',inplace=True)
+    df_quasars['kw2'] = df_quasars.TMASS_mag_k-df_quasars.WISE_mag_w2
+    df_quasars['jk'] = df_quasars.TMASS_mag_j-df_quasars.TMASS_mag_k
+    df_quasars.query('kw2 >= 1.8-0.848*jk',inplace=True)
+
+    df_stars['kw2'] = df_stars.TMASS_mag_k-df_stars.WISE_mag_w2
+    df_stars['jk'] = df_stars.TMASS_mag_j-df_stars.TMASS_mag_k
+
+    df_stars.query('kw2 >= 1.8-0.848*jk',inplace=True)
 
 
     df_stars.query('SDSS_mag_i <= 18.5',inplace=True)
-    df_quasars.query('obsMag_SDSS_i <= 18.5',inplace=True)
+    df_quasars.query('SDSS_mag_i <=18.5',inplace=True)
+    # df_quasars.query('obsMag_SDSS_i <= 18.5',inplace=True)
 
     #Create more detailed classes
-    df_stars, df_quasars = create_labels(df_stars, df_quasars)
+    df_stars, df_quasars = create_labels(df_stars, df_quasars,'z')
+
 
     # Build a test sample with a given QSO to STAR ratio
     # df = qs.build_full_sample(df_stars, df_quasars, 20)
     df_quasars['label']='QSO'
     df_stars['label']='STAR'
     df = pd.concat([df_stars,df_quasars])
-    print df.label.value_counts()
+
+    df.drop(df.query('class_label == "null"').index, inplace=True)
 
     # Declare labels and select features to classify on
     labels = ["STAR","QSO"]
