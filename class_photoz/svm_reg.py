@@ -64,7 +64,7 @@ def svm_reg_grid_search(df,features,label,param_grid,rand_state,scores,name):
         print()
 
         reg = GridSearchCV(SVR(), \
-                        param_grid,scoring='%s' % score,cv=5,n_jobs=4)
+                        param_grid,scoring='%s' % score,cv=5,n_jobs=6)
 
         reg.fit(X_train, y_train)
 

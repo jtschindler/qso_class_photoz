@@ -360,7 +360,7 @@ def test_example():
     # Preparing the feature matrix
     # --------------------------------------------------------------------------
     df_train = pd.read_hdf('../class_photoz/data/DR7DR14Q_flux_cat.hdf5','data')
-
+    # df_train = pd.read_hdf('../class_photoz/data/brightqsos_sim_2k_new.hdf5','data')
     passband_names = [\
             'SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
             # 'TMASS_j','TMASS_h','TMASS_k', \
@@ -377,10 +377,10 @@ def test_example():
     # --------------------------------------------------------------------------
 
     features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
-    label = 'Z'
+    label = 'Z_VI'
     rand_state = 1
 
-    params = {'n_estimators': 200, 'max_depth': 20, 'min_samples_split': 4, 'n_jobs': 2, 'random_state':rand_state}
+    params = {'n_estimators': 300, 'max_depth': 20, 'min_samples_split': 2, 'n_jobs': 1, 'random_state':rand_state}
 
 
     rf.rf_reg_example(df_train,features,label,params,rand_state)
@@ -395,7 +395,7 @@ def predict_example():
     # Preparing the feature matrix
     # --------------------------------------------------------------------------
     df_test = pd.read_hdf('../class_photoz/data/DR7DR14Q_flux_cat.hdf5','data')
-    df_train = pd.read_hdf('../class_photoz/data/brightqsos_2.hdf5','data')
+    df_train = pd.read_hdf('../class_photoz/data/brightqsos_sim_2k_new.hdf5','data')
     passband_names = [\
             'SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
             # 'TMASS_j','TMASS_h','TMASS_ks', \
@@ -439,5 +439,5 @@ def predict_example():
 
 
 # DR7DR12_grid_search()
-# test_example()
-simqsos_grid_search()
+test_example()
+# simqsos_grid_search()

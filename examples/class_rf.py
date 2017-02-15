@@ -23,15 +23,15 @@ def create_labels(df_stars, df_quasars,z_label):
 
 
 
-    lowz=[0,1,2,3]
-    highz=[1,2,3,10]
-    labels=['vlowz','lowz','midz','highz']
+    lowz=[0,1.5,2.2,3.5]
+    highz=[1,5,2.2,3.5,10]
+    labels=['0<z<=1.5','1.5<z<=2.2','2.2<=3.5','3.5<z']
     df_quasars['class_label'] = 'null'
     df_quasars.query('0<'+str(z_label)+'<10',inplace=True)
     for idx in range(len(lowz)):
 
         df_quasars.loc[
-                df_quasars.query(str(lowz[idx])+'<'+z_label+'<'+str(highz[idx])).index, \
+                df_quasars.query(str(lowz[idx])+'<'+z_label+'<='+str(highz[idx])).index, \
                 'class_label'] = labels[idx]
 
     print df_quasars.class_label.value_counts()
@@ -137,14 +137,14 @@ def test_example():
     # df_quasars['jk'] = df_quasars.obsMag_TMASS_j-df_quasars.obsMag_TMASS_k
     # df_quasars.query('kw2 >= -0.501208-0.848*jk',inplace=True)
     #
-    df_quasars['kw2'] = df_quasars.TMASS_mag_k-df_quasars.WISE_mag_w2
-    df_quasars['jk'] = df_quasars.TMASS_mag_j-df_quasars.TMASS_mag_k
-    df_quasars.query('kw2 >= 1.8-0.848*jk',inplace=True)
-
-    df_stars['kw2'] = df_stars.TMASS_mag_k-df_stars.WISE_mag_w2
-    df_stars['jk'] = df_stars.TMASS_mag_j-df_stars.TMASS_mag_k
-
-    df_stars.query('kw2 >= 1.8-0.848*jk',inplace=True)
+    # df_quasars['kw2'] = df_quasars.TMASS_mag_k-df_quasars.WISE_mag_w2
+    # df_quasars['jk'] = df_quasars.TMASS_mag_j-df_quasars.TMASS_mag_k
+    # df_quasars.query('kw2 >= 1.8-0.848*jk',inplace=True)
+    #
+    # df_stars['kw2'] = df_stars.TMASS_mag_k-df_stars.WISE_mag_w2
+    # df_stars['jk'] = df_stars.TMASS_mag_j-df_stars.TMASS_mag_k
+    #
+    # df_stars.query('kw2 >= 1.8-0.848*jk',inplace=True)
 
 
     df_stars.query('SDSS_mag_i <= 18.5',inplace=True)
