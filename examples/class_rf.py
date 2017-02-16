@@ -24,7 +24,7 @@ def create_labels(df_stars, df_quasars,z_label):
 
 
     lowz=[0,1.5,2.2,3.5]
-    highz=[1,5,2.2,3.5,10]
+    highz=[1.5,2.2,3.5,10]
     labels=['0<z<=1.5','1.5<z<=2.2','2.2<=3.5','3.5<z']
     df_quasars['class_label'] = 'null'
     df_quasars.query('0<'+str(z_label)+'<10',inplace=True)
@@ -43,7 +43,7 @@ def create_labels(df_stars, df_quasars,z_label):
 
 def grid_search_example():
 
-    df_stars = pd.read_hdf('../class_photoz/data/DR13_stars_fluxcat.hdf5','data')
+    df_stars = pd.read_hdf('../class_photoz/data/DR13_stars_clean_flux_cat.hdf5','data')
     # df_quasars = pd.read_hdf('../class_photoz/data/DR7DR12Q_clean_flux_cat.hdf5','data')
     df_quasars = pd.read_hdf('../class_photoz/data/brightqsos_sim_2k_new.hdf5','data')
 
@@ -93,9 +93,9 @@ def grid_search_example():
 
 def test_example():
 
-    df_stars = pd.read_hdf('../class_photoz/data/DR13_stars_fluxcat.hdf5','data')
+    df_stars = pd.read_hdf('../class_photoz/data/DR13_stars_clean_flux_cat.hdf5','data')
     df_quasars = pd.read_hdf('../class_photoz/data/DR7DR12Q_clean_flux_cat.hdf5','data')
-    # df_quasars = pd.read_hdf('../class_photoz/data/brightqsos_sim_2k_new.hdf5','data')
+    #df_quasars = pd.read_hdf('../class_photoz/data/brightqsos_sim_2k_new.hdf5','data')
 
     passband_names = ['SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
                         'TMASS_j', \
@@ -107,12 +107,12 @@ def test_example():
                         # 'WISE_w4', \
                         ]
 
-    print df_stars.shape
-    print df_quasars.shape
+    #print "Stars: ",df_stars.shape
+    #print "Quasars: ",df_quasars.shape
 
     #TODO Only for now delete later
-    df_stars = df_stars.rename(columns={'sigma_TMASS_ks':'sigma_TMASS_k', \
-            'TMASS_ks':'TMASS_k','TMASS_mag_ks':'TMASS_mag_k'})
+    #df_stars = df_stars.rename(columns={'sigma_TMASS_ks':'sigma_TMASS_k', \
+    #        'TMASS_ks':'TMASS_k','TMASS_mag_ks':'TMASS_mag_k'})
 
     #embed this in the sim qso conversion file!
     for name in passband_names:
@@ -122,8 +122,9 @@ def test_example():
 
     df_stars,features = qs.prepare_flux_ratio_catalog(df_stars,passband_names)
     df_quasars,features = qs.prepare_flux_ratio_catalog(df_quasars,passband_names)
-    print features
-    print df_stars.shape
+
+    #print "Stars: ",df_stars.shape
+    #print "Quasars: ",df_quasars.shape
 
 
     #Reduce the total set of objects for testing the routines
@@ -133,23 +134,24 @@ def test_example():
 
 
     #Impose allsky selection criteria on the dataframes
-    # df_quasars['kw2'] = df_quasars.obsMag_TMASS_k-df_quasars.obsMag_WISE_w2
-    # df_quasars['jk'] = df_quasars.obsMag_TMASS_j-df_quasars.obsMag_TMASS_k
-    # df_quasars.query('kw2 >= -0.501208-0.848*jk',inplace=True)
+    #df_quasars['kw2'] = df_quasars.obsMag_TMASS_k-df_quasars.obsMag_WISE_w2
+    #df_quasars['jk'] = df_quasars.obsMag_TMASS_j-df_quasars.obsMag_TMASS_k
+    #df_quasars.query('kw2 >= -0.501208-0.848*jk',inplace=True)
     #
-    # df_quasars['kw2'] = df_quasars.TMASS_mag_k-df_quasars.WISE_mag_w2
-    # df_quasars['jk'] = df_quasars.TMASS_mag_j-df_quasars.TMASS_mag_k
-    # df_quasars.query('kw2 >= 1.8-0.848*jk',inplace=True)
+    df_quasars['kw2'] = df_quasars.TMASS_mag_k-df_quasars.WISE_mag_w2
+    df_quasars['jk'] = df_quasars.TMASS_mag_j-df_quasars.TMASS_mag_k
+    df_quasars.query('kw2 >= 1.8-0.848*jk',inplace=True)
     #
-    # df_stars['kw2'] = df_stars.TMASS_mag_k-df_stars.WISE_mag_w2
-    # df_stars['jk'] = df_stars.TMASS_mag_j-df_stars.TMASS_mag_k
-    #
-    # df_stars.query('kw2 >= 1.8-0.848*jk',inplace=True)
+    df_stars['kw2'] = df_stars.TMASS_mag_k-df_stars.WISE_mag_w2
+    df_stars['jk'] = df_stars.TMASS_mag_j-df_stars.TMASS_mag_k
+    df_stars.query('kw2 >= 1.8-0.848*jk',inplace=True)
 
 
     df_stars.query('SDSS_mag_i <= 18.5',inplace=True)
     df_quasars.query('SDSS_mag_i <=18.5',inplace=True)
-    # df_quasars.query('obsMag_SDSS_i <= 18.5',inplace=True)
+    #df_quasars.query('obsMag_SDSS_i <= 18.5',inplace=True)
+    print "Stars: ",df_stars.shape
+    print "Quasars: ",df_quasars.shape
 
     #Create more detailed classes
     df_stars, df_quasars = create_labels(df_stars, df_quasars,'z')
@@ -170,7 +172,8 @@ def test_example():
                 'hk', 'kw1', 'w1w2']
     # features = ['SDSS_i','TMASS_j','ug','gr','ri','iz','zj','jh',  \
 #                 'hk']
-    # features = ['ug','gr','ri','iz']
+    #features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
+    #features = ['SDSS_i','ug','gr','ri','iz']
     label = 'class_label'
     # label = 'label'
 

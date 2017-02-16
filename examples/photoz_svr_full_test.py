@@ -116,7 +116,7 @@ def DR7DR12_grid_search():
             # 'WISE_w3' \
             ]
     df_train = df.copy(deep=True)
-    df_train.query('PSFMAG_I < 18.5',inplace=True)
+    df_train.query('SDSS_mag_i <= 18.5',inplace=True)
     df_train,features = qs.prepare_flux_ratio_catalog(df_train,passband_names)
 
     # --------------------------------------------------------------------------
@@ -140,7 +140,7 @@ def DR7DR12_grid_search():
             # 'WISE_w3' \
             ]
     df_train = df.copy(deep=True)
-    df_train.query('PSFMAG_I < 18.5',inplace=True)
+    df_train.query('SDSS_mag_i <= 18.5',inplace=True)
     df_train,features = qs.prepare_flux_ratio_catalog(df_train,passband_names)
 
        # --------------------------------------------------------------------------
@@ -245,7 +245,7 @@ def simqsos_grid_search():
         df_train.rename(columns={'obsFlux_'+name:name},inplace=True)
         df_train.rename(columns={'obsFluxErr_'+name:'sigma_'+name},inplace=True)
 
-    df_train.query('obsMag_SDSS_i < 18.5',inplace=True)
+    df_train.query('obsMag_SDSS_i <= 18.5',inplace=True)
     df_train,features = qs.prepare_flux_ratio_catalog(df_train,passband_names)
 
     # --------------------------------------------------------------------------
@@ -274,7 +274,7 @@ def simqsos_grid_search():
         df_train.rename(columns={'obsFlux_'+name:name},inplace=True)
         df_train.rename(columns={'obsFluxErr_'+name:'sigma_'+name},inplace=True)
 
-    df_train.query('obsMag_SDSS_i < 18.5',inplace=True)
+    df_train.query('obsMag_SDSS_i <= 18.5',inplace=True)
     df_train,features = qs.prepare_flux_ratio_catalog(df_train,passband_names)
 
     # --------------------------------------------------------------------------
@@ -304,7 +304,7 @@ def simqsos_grid_search():
         df_train.rename(columns={'obsFlux_'+name:name},inplace=True)
         df_train.rename(columns={'obsFluxErr_'+name:'sigma_'+name},inplace=True)
 
-    df_train.query('obsMag_SDSS_i < 18.5',inplace=True)
+    df_train.query('obsMag_SDSS_i <= 18.5',inplace=True)
     df_train['kw2'] = df_train.obsMag_TMASS_k-df_train.obsMag_WISE_w2
     df_train['jk'] = df_train.obsMag_TMASS_j-df_train.obsMag_TMASS_k
     df_train.query('kw2 >= -0.501208-0.848*jk',inplace=True)
