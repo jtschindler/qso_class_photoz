@@ -225,7 +225,7 @@ def simqsos_grid_search():
 
     features = ['SDSS_i','ug','gr','ri','iz']
 
-    # svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'simqsos_SDSS5a')
+    svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'simqsos_SDSS5a')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -416,7 +416,7 @@ def predict_example():
 
 
 #test_example()
-# simqsos_grid_search()
-DR7DR12_grid_search()
+simqsos_grid_search()
+#DR7DR12_grid_search()
 # grid_search_example()
 # predict_example()
