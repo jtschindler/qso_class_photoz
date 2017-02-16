@@ -138,13 +138,13 @@ def test_example():
     #df_quasars['jk'] = df_quasars.obsMag_TMASS_j-df_quasars.obsMag_TMASS_k
     #df_quasars.query('kw2 >= -0.501208-0.848*jk',inplace=True)
     #
-    df_quasars['kw2'] = df_quasars.TMASS_mag_k-df_quasars.WISE_mag_w2
-    df_quasars['jk'] = df_quasars.TMASS_mag_j-df_quasars.TMASS_mag_k
-    df_quasars.query('kw2 >= 1.8-0.848*jk',inplace=True)
+    # df_quasars['kw2'] = df_quasars.TMASS_mag_k-df_quasars.WISE_mag_w2
+    # df_quasars['jk'] = df_quasars.TMASS_mag_j-df_quasars.TMASS_mag_k
+    # df_quasars.query('kw2 >= 1.8-0.848*jk',inplace=True)
     #
-    df_stars['kw2'] = df_stars.TMASS_mag_k-df_stars.WISE_mag_w2
-    df_stars['jk'] = df_stars.TMASS_mag_j-df_stars.TMASS_mag_k
-    df_stars.query('kw2 >= 1.8-0.848*jk',inplace=True)
+    # df_stars['kw2'] = df_stars.TMASS_mag_k-df_stars.WISE_mag_w2
+    # df_stars['jk'] = df_stars.TMASS_mag_j-df_stars.TMASS_mag_k
+    # df_stars.query('kw2 >= 1.8-0.848*jk',inplace=True)
 
 
     df_stars.query('SDSS_mag_i <= 18.5',inplace=True)
@@ -181,7 +181,9 @@ def test_example():
     params = {'n_estimators': 200, 'max_depth': 20, 'min_samples_split': 3,
         'n_jobs': 4, 'random_state': 0}
 
-    rf_class.rf_class_example(df, features, label, params)
+    rand_state=1
+
+    rf_class.rf_class_example(df, features, label, params,rand_state)
 
 
 

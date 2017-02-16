@@ -55,7 +55,7 @@ def DR7DR12_grid_search():
 
     features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
 
-    svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR12_SDSS5W1W2')
+    # svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR12_SDSS5W1W2')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -78,7 +78,7 @@ def DR7DR12_grid_search():
 
     features = ['SDSS_i','ug','gr','ri','iz']
 
-    svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR12_SDSS5a')
+    # svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR12_SDSS5a')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -101,7 +101,7 @@ def DR7DR12_grid_search():
 
     features = ['SDSS_i','ug','gr','ri','iz']
 
-    svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR12_SDSS5b')
+    # svr.svm_reg_grid_search(df_train,features,label,param_grid,rand_state,scores,'DR7DR12_SDSS5b')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -416,7 +416,7 @@ def predict_example():
 
 
 #test_example()
-simqsos_grid_search()
-# DR7DR12_grid_search()
+# simqsos_grid_search()
+DR7DR12_grid_search()
 # grid_search_example()
 # predict_example()

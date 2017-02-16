@@ -15,7 +15,7 @@ from sklearn.ensemble import RandomForestClassifier
 import ml_sets as sets
 import ml_analysis as ml_an
 
-def rf_class_grid_search(df, features, label, param_grid):
+def rf_class_grid_search(df, features, label, param_grid, rand_state, scores, name):
     """This routine calculates the random forest classification on a
     grid of hyper-parameters for the random forest method to test the best
     support vector classification hyper-parameters. The results of the test
@@ -35,31 +35,18 @@ def rf_class_grid_search(df, features, label, param_grid):
     X,y = sets.build_matrices(df, features,label)
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X,y, test_size=0.2, random_state=0)
+        X,y, test_size=0.2, random_state=rand_state)
 
     print X_train.shape, X_test.shape
-
-    scores = ['f1_weighted']
 
     for score in scores:
         print("# Tuning hyper-parameters for %s" % score)
         print()
 
-        clf = GridSearchCV(RandomForestClassifier(random_state=0),
+        clf = GridSearchCV(RandomForestClassifier(random_state=rand_state),
             param_grid, cv=5, scoring='%s' % score, n_jobs = 4)
 
         clf.fit(X_train, y_train)
-
-        print("Best parameters set found on training set:")
-        print()
-        print(clf.best_params_)
-        print()
-        print("Grid scores on training set:")
-        print()
-        for params, mean_score, scores in clf.grid_scores_:
-            print("%0.5f (+/-%0.03f) for %r"
-                  % (mean_score, scores.std() * 2, params))
-        print()
 
         print("Detailed classification report:")
         print()
@@ -68,6 +55,27 @@ def rf_class_grid_search(df, features, label, param_grid):
         print()
         y_true, y_pred = y_test, clf.predict(X_test)
         print(classification_report(y_true, y_pred))
+        print()
+
+        print("Best parameters set found on training set:")
+        print()
+        print(reg.best_params_)
+        print()
+        print("Grid scores on training set:")
+        print()
+        means = reg.cv_results_['mean_test_score']
+        stds = reg.cv_results_['std_test_score']
+        for mean, std, params in zip(means, stds, reg.cv_results_['params']):
+            print("%0.3f (+/-%0.03f) for %r"
+                % (mean, std * 2, params))
+        print()
+        df = pd.DataFrame(reg.cv_results_)
+        df.to_hdf('RF_GS_CLASS_'+name+'_'+score+'.hdf5','data')
+        print()
+        print("The model is trained on the full development set (80%).")
+        print("The scores are computed on the full evaluation set (20%).")
+        print()
+        y_true, y_pred = y_test, reg.predict(X_test)
         print()
 
 
@@ -100,7 +108,7 @@ def rf_class_validation_curve(df, features, label, params, param_name, param_ran
     plt.show()
 
 
-def rf_class_example(df, features, label, params):
+def rf_class_example(df, features, label, params,rand_state):
     """This routine calculates an example of the random forest classification
      method. It prints the classification report and feature importances, the
      ROC AUC score and shows the learning curve for the chosen hyper-parameters
@@ -124,10 +132,10 @@ def rf_class_example(df, features, label, params):
 
     # score curves, each time with 20% data randomly selected for validation.
     cv = cross_validation.ShuffleSplit(df.shape[0], n_iter=10,
-                                   test_size=0.2, random_state=0)
+                                   test_size=0.2, random_state=rand_state)
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X,y, test_size=0.2, random_state=0)
+        X,y, test_size=0.2, random_state=rand_state)
 
 
     clf = RandomForestClassifier(**params)
