@@ -15,7 +15,8 @@ import photoz_analysis as pz_an
 def rf_reg_grid_search(df,features,label,param_grid,rand_state,scores,name):
     """This routine calculates the random forest regression on a grid of
     hyper-parameters for the random forest method to test the best
-    hyper-parameters. The analysis results of the test will be written out.
+    hyper-parameters. The analysis results of the test will be written out and
+    saved.
 
     Parameters:
             df : pandas dataframe
@@ -178,6 +179,8 @@ def rf_reg_validation_curve(df,features,label,params,val_param,val_range):
 
     """
 
+    print "THIS FUNCTION IS DEPRECATED"
+
     X,y = sets.build_matrices(df, features,label)
 
     # Random Forest Regression
@@ -223,6 +226,7 @@ def rf_reg_predict(train_set, pred_set, features, label, params, pred_label):
 
     for feature in features:
       train_set.dropna(axis=0,how='any',subset=[feature],inplace=True)
+
 
     # Building test and training sample
     train_X, train_y = sets.build_matrices(train_set, features, label)

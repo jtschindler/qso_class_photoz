@@ -66,8 +66,8 @@ def grid_search_example():
     df_quasars,features = qs.prepare_flux_ratio_catalog(df_quasars,passband_names)
 
     #Reduce the total set of objects for testing the routines
-    df_stars = df_stars.sample(frac=1.0)
-    df_quasars = df_quasars.sample(frac=1.0)
+    df_stars = df_stars.sample(frac=0.2)
+    df_quasars = df_quasars.sample(frac=0.2)
 
 
 

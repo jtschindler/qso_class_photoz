@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import math
-from sklearn import preprocessing, cross_validation
 
 
 def build_matrices(df, features,label, drop_nans = True):

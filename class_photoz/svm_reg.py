@@ -18,9 +18,10 @@ import ml_analysis as ml_an
 import photoz_analysis as pz_an
 
 def svm_reg_grid_search(df,features,label,param_grid,rand_state,scores,name):
-    """This routine calculates the random forest regression on a grid of
-    hyper-parameters for the random forest method to test the best
-    hyper-parameters. The analysis results of the test will be written out.
+    """This routine calculates the support vector machine regression on a grid
+    of hyper-parameters for the random forest method to test the best
+    hyper-parameters. The analysis results of the test will be written out and
+    saved.
 
     Parameters:
             df : pandas dataframe
