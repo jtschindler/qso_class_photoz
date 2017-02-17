@@ -17,7 +17,7 @@ from class_photoz import rf_reg as rf
 from class_photoz import ml_analysis as ml_an
 from class_photoz import photoz_analysis as pz_an
 
-def DR7DR12_grid_search():
+def dr7dr12_grid_search():
     # --------------------------------------------------------------------------
     # Read data file and input parameters
     # --------------------------------------------------------------------------
@@ -178,6 +178,18 @@ def DR7DR12_grid_search():
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def simqsos_grid_search():
@@ -355,12 +367,18 @@ def simqsos_grid_search():
 
 
 
-def test_example():
+
+
+
+
+
+
+def simqso_test():
     # --------------------------------------------------------------------------
     # Preparing the feature matrix
     # --------------------------------------------------------------------------
-    df_train = pd.read_hdf('../class_photoz/data/DR7DR14Q_flux_cat.hdf5','data')
-    # df_train = pd.read_hdf('../class_photoz/data/brightqsos_sim_2k_new.hdf5','data')
+
+    df_train = pd.read_hdf('../class_photoz/data/brightqsos_sim_2k_new.hdf5','data')
     passband_names = [\
             'SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
             # 'TMASS_j','TMASS_h','TMASS_k', \
@@ -368,7 +386,14 @@ def test_example():
             # 'WISE_w3' \
             ]
 
+    for name in passband_names:
+        df_train.rename(columns={'obsFlux_'+name:name},inplace=True)
+        df_train.rename(columns={'obsFluxErr_'+name:'sigma_'+name},inplace=True)
+
+
     df_train.replace(np.inf, np.nan,inplace=True)
+    df_train.query('obsMag_SDSS_i <= 18.5',inplace=True)
+
 
     df_train,features = qs.prepare_flux_ratio_catalog(df_train,passband_names)
 
@@ -377,15 +402,58 @@ def test_example():
     # --------------------------------------------------------------------------
 
     features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
-    label = 'Z_VI'
+    # features = ['SDSS_i','ug','gr','ri','iz']
+    
+    label = 'z'
     rand_state = 1
 
-    params = {'n_estimators': 300, 'max_depth': 20, 'min_samples_split': 2, 'n_jobs': 1, 'random_state':rand_state}
+    params = {'n_estimators': 50, 'max_depth': 15, 'min_samples_split': 2, 'n_jobs': 2, 'random_state':rand_state}
 
 
     rf.rf_reg_example(df_train,features,label,params,rand_state)
 
 
+
+
+
+
+
+def dr7dr12_test():
+    # --------------------------------------------------------------------------
+    # Preparing the feature matrix
+    # --------------------------------------------------------------------------
+    df_train = pd.read_hdf('../class_photoz/data/DR7DR12Q_clean_flux_cat.hdf5','data')
+
+    passband_names = [\
+            'SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
+            # 'TMASS_j','TMASS_h','TMASS_k', \
+            'WISE_w1','WISE_w2', \
+            # 'WISE_w3' \
+            ]
+
+
+    df_train.replace(np.inf, np.nan,inplace=True)
+    df_train = df_train.query('0 < Z_VI < 10')
+
+    # df_train.query('SDSS_mag_i <= 18.5',inplace=True)
+
+
+
+    df_train,features = qs.prepare_flux_ratio_catalog(df_train,passband_names)
+
+    # --------------------------------------------------------------------------
+    # Random Forest Regression Grid Search
+    # --------------------------------------------------------------------------
+
+    features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
+    # features = ['SDSS_i','ug','gr','ri','iz']
+    # label = 'Z_VI'
+    rand_state = 1
+
+    params = {'n_estimators': 300, 'max_depth': 20, 'min_samples_split': 4, 'n_jobs': 2, 'random_state':rand_state}
+
+
+    rf.rf_reg_example(df_train,features,label,params,rand_state)
 
 
 
@@ -438,6 +506,6 @@ def predict_example():
     plt.show()
 
 
-DR7DR12_grid_search()
-# test_example()
+# DR7DR12_grid_search()
+test_example()
 # simqsos_grid_search()
