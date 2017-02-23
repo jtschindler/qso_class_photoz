@@ -18,7 +18,36 @@ from sklearn import preprocessing
 import ml_sets as sets
 import ml_analysis as ml_an
 
-def rf_class_grid_search(df, features, label, param_grid, rand_state, scores, name):
+
+def prepare_qso_star_data(df_stars,df_qsos,features,label,rand_state):
+
+    X_stars,y_stars = sets.build_matrices(df_stars, features,label)
+
+    X_st_tr,X_st_te,y_st_tr,y_st_te = train_test_split(
+            X_stars,y_stars, test_size=0.2,random_state=rand_state)
+
+    X_qsos,y_qsos = sets.build_matrices(df_qsos, features,label)
+
+    X_qs_tr,X_qs_te,y_qs_tr,y_qs_te = train_test_split(
+            X_qsos,y_qsos, test_size=0.2,random_state=rand_state)
+
+    X_train = np.concatenate((X_st_tr,X_qs_tr),axis=0)
+    X_test = np.concatenate((X_st_te,X_qs_te),axis=0)
+
+    y_train = np.concatenate((y_st_tr,y_qs_tr),axis=0)
+    y_test = np.concatenate((y_st_te,y_qs_te),axis=0)
+
+    # Standardizing the data
+    X_train = preprocessing.robust_scale(X_train)
+    X_test = preprocessing.robust_scale(X_test)
+
+    print pd.Series(y_train).value_counts()
+    print pd.Series(y_test).value_counts()
+
+
+    return X_train,y_train,X_test,y_test
+
+def rf_class_grid_search(df_stars,df_qsos, features, label, param_grid, rand_state, scores, name):
     """This routine calculates the random forest classification on a grid of
     hyper-parameters for the random forest method to test the best
     hyper-parameters. The analysis results of the test will be written out and
@@ -50,13 +79,9 @@ def rf_class_grid_search(df, features, label, param_grid, rand_state, scores, na
 
     """
 
-    X,y = sets.build_matrices(df, features,label)
 
-    # Standardizing the data
-    X = preprocessing.robust_scale(X)
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        X,y, test_size=0.2, random_state=rand_state)
+    X_train, y_train, X_test, y_test = \
+            prepare_qso_star_data(df_stars,df_qsos,features,label,rand_state)
 
     print X_train.shape, X_test.shape
 
@@ -134,7 +159,7 @@ def rf_class_validation_curve(df, features, label, params, param_name, param_ran
     plt.show()
 
 
-def rf_binaryclass_example(df, features, label, params,rand_state):
+def rf_binaryclass_example(df_stars,df_qsos, features, label, params,rand_state):
     """This routine calculates an example of the random forest classification
      method. It is aimed at classification with only two classes (STAR/QSO).
      It prints the classification report and feature importances, the
@@ -159,18 +184,8 @@ def rf_binaryclass_example(df, features, label, params,rand_state):
             Setting the random state variables to ensure reproducibility
     """
 
-    X,y = sets.build_matrices(df, features,label)
-
-    # Standardizing the data
-    X = preprocessing.robust_scale(X)
-
-    # # score curves, each time with 20% data randomly selected for validation.
-    # cv = ShuffleSplit(df.shape[0], n_iter=10,
-    #                                test_size=0.2, random_state=rand_state)
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        X,y, test_size=0.2, random_state=rand_state)
-
+    X_train, y_train, X_test, y_test = \
+            prepare_qso_star_data(df_stars,df_qsos,features,label,rand_state)
 
     clf = RandomForestClassifier(**params)
 
@@ -199,7 +214,7 @@ def rf_binaryclass_example(df, features, label, params,rand_state):
 
 
 
-def rf_multiclass_example(df, features, label, params,rand_state):
+def rf_multiclass_example(df_stars,df_qsos, features, label, params,rand_state):
     """This routine calculates an example of the random forest classification
      method. It is aimed at multi-class classification.
      It prints the classification report and feature importances and shows the
@@ -223,18 +238,8 @@ def rf_multiclass_example(df, features, label, params,rand_state):
             Setting the random state variables to ensure reproducibility
     """
 
-    X,y = sets.build_matrices(df, features,label)
-
-    # Standardizing the data
-    X = preprocessing.robust_scale(X)
-
-    # # score curves, each time with 20% data randomly selected for validation.
-    # cv = ShuffleSplit(df.shape[0], n_iter=10,
-    #                                test_size=0.2, random_state=rand_state)
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        X,y, test_size=0.2, random_state=rand_state)
-
+    X_train, y_train, X_test, y_test = \
+            prepare_qso_star_data(df_stars,df_qsos,features,label,rand_state)
 
     clf = RandomForestClassifier(**params)
 

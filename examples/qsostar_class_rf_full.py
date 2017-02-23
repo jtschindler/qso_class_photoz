@@ -92,7 +92,6 @@ def dr7dr12q_grid_search():
     df_stars_train,features = qs.prepare_flux_ratio_catalog(df_stars_train,passband_names)
     df_qsos_train,features = qs.prepare_flux_ratio_catalog(df_qsos_train,passband_names)
 
-    df = pd.concat([df_stars_train,df_qsos_train])
 
     #Choose label: 'label' = 2 classes, 'class_label'= multiple classes
     label = 'class_label'
@@ -103,7 +102,7 @@ def dr7dr12q_grid_search():
     # Random Forest Regression Grid Search
     # --------------------------------------------------------------------------
 
-    rf_class.rf_class_grid_search(df,features, label ,param_grid, rand_state, scores, 'SDSS')
+    rf_class.rf_class_grid_search(df_stars_train,df_qsos_train,features, label ,param_grid, rand_state, scores, 'SDSS')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -127,7 +126,6 @@ def dr7dr12q_grid_search():
     df_stars_train,features = qs.prepare_flux_ratio_catalog(df_stars_train,passband_names)
     df_qsos_train,features = qs.prepare_flux_ratio_catalog(df_qsos_train,passband_names)
 
-    df = pd.concat([df_stars_train,df_qsos_train])
 
     #Choose label: 'label' = 2 classes, 'class_label'= multiple classes
     label = 'class_label'
@@ -138,7 +136,7 @@ def dr7dr12q_grid_search():
     # Random Forest Regression Grid Search
     # --------------------------------------------------------------------------
 
-    rf_class.rf_class_grid_search(df,features, label ,param_grid, rand_state, scores, 'SDSSW1W2')
+    rf_class.rf_class_grid_search(df_stars_train,df_qsos_train,features, label ,param_grid, rand_state, scores, 'SDSSW1W2')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -162,7 +160,6 @@ def dr7dr12q_grid_search():
     df_stars_train,features = qs.prepare_flux_ratio_catalog(df_stars_train,passband_names)
     df_qsos_train,features = qs.prepare_flux_ratio_catalog(df_qsos_train,passband_names)
 
-    df = pd.concat([df_stars_train,df_qsos_train])
 
     #Choose label: 'label' = 2 classes, 'class_label'= multiple classes
     label = 'class_label'
@@ -174,7 +171,7 @@ def dr7dr12q_grid_search():
     # Random Forest Regression Grid Search
     # --------------------------------------------------------------------------
 
-    rf_class.rf_class_grid_search(df,features, label ,param_grid, rand_state, scores, 'SDSSTMASSW1W2')
+    rf_class.rf_class_grid_search(df_stars_train,df_qsos_train,features, label ,param_grid, rand_state, scores, 'SDSSTMASSW1W2')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -389,9 +386,7 @@ def test_example():
     # df = qs.build_full_sample(df_stars, df_quasars, 20)
     df_quasars['label']='QSO'
     df_stars['label']='STAR'
-    df = pd.concat([df_stars,df_quasars])
 
-    df.drop(df.query('class_label == "null"').index, inplace=True)
 
     # Declare labels and select features to classify on
     labels = ["STAR","QSO"]
@@ -407,14 +402,14 @@ def test_example():
 
 
     params = {'n_estimators': 200, 'max_depth': 20, 'min_samples_split': 3,
-        'n_jobs': 4, 'random_state': 0}
+        'n_jobs': 4, 'random_state': 1}
 
     rand_state=1
 
-    rf_class.rf_multiclass_example(df, features, label, params,rand_state)
+    rf_class.rf_multiclass_example(df_stars, df_quasars, features, label, params,rand_state)
 
 
 
 
-dr7dr12q_grid_search()
-# test_example()
+# dr7dr12q_grid_search()
+test_example()
