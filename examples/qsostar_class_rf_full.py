@@ -53,10 +53,10 @@ def dr7dr12q_grid_search():
     df_stars = pd.read_hdf('../class_photoz/data/DR13_stars_clean_flux_cat.hdf5','data')
     df_quasars = pd.read_hdf('../class_photoz/data/DR7DR12Q_clean_flux_cat.hdf5','data')
 
-    # param_grid = [{'n_estimators': [50,100,200,300], 'min_samples_split': [2,3,4],
-                    # 'max_depth' : [15,20,25]}]
-    param_grid = [{'n_estimators': [50,100], 'min_samples_split': [2,3],
-                    'max_depth' : [20,25]}]
+    param_grid = [{'n_estimators': [50,100,200,300], 'min_samples_split': [2,3,4],
+                    'max_depth' : [15,20,25]}]
+    # param_grid = [{'n_estimators': [50,100], 'min_samples_split': [2,3],
+    #                 'max_depth' : [20,25]}]
     rand_state=1
     scores = ['f1_weighted']
 
@@ -72,8 +72,8 @@ def dr7dr12q_grid_search():
     df_stars, df_quasars = create_labels(df_stars, df_quasars,'Z_VI')
 
     # FOR TESTING PURPOSES
-    df_stars = df_stars.sample(frac=0.2)
-    df_quasars = df_quasars.sample(frac=0.2)
+    # df_stars = df_stars.sample(frac=0.2)
+    # df_quasars = df_quasars.sample(frac=0.2)
 
     # --------------------------------------------------------------------------
     # Preparation of training set
@@ -416,5 +416,5 @@ def test_example():
 
 
 
-# dr7dr12q_grid_search()
-test_example()
+dr7dr12q_grid_search()
+# test_example()
