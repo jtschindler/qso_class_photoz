@@ -15,7 +15,7 @@ def create_labels(df_stars, df_quasars,z_label):
 
     for label in star_labels:
 
-        if df_stars.class_label.value_counts()[label] < 100:
+        if df_stars.class_label.value_counts()[label] < 400:
             df_stars.drop(df_stars.query('class_label == "'+label+'"').index,
                                                                 inplace=True)
 
@@ -61,8 +61,8 @@ def dr7dr12q_grid_search():
     scores = ['f1_weighted']
 
     # Restrict the data set
-    df_stars.query('SDSS_mag_i <= 18.5',inplace=True)
-    df_quasars.query('SDSS_mag_i <=18.5',inplace=True)
+    df_stars.query('SDSS_mag_i <= 19.5',inplace=True)
+    df_quasars.query('SDSS_mag_i <=19.5',inplace=True)
 
     # Create basic classes
     df_quasars['label']='QSO'
@@ -102,7 +102,7 @@ def dr7dr12q_grid_search():
     # Random Forest Regression Grid Search
     # --------------------------------------------------------------------------
 
-    rf_class.rf_class_grid_search(df_stars_train,df_qsos_train,features, label ,param_grid, rand_state, scores, 'SDSS')
+    rf_class.rf_class_grid_search(df_stars_train,df_qsos_train,features, label ,param_grid, rand_state, scores, 'SDSS_i195')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -136,7 +136,7 @@ def dr7dr12q_grid_search():
     # Random Forest Regression Grid Search
     # --------------------------------------------------------------------------
 
-    rf_class.rf_class_grid_search(df_stars_train,df_qsos_train,features, label ,param_grid, rand_state, scores, 'SDSSW1W2')
+    rf_class.rf_class_grid_search(df_stars_train,df_qsos_train,features, label ,param_grid, rand_state, scores, 'SDSSW1W2_i195')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -171,7 +171,7 @@ def dr7dr12q_grid_search():
     # Random Forest Regression Grid Search
     # --------------------------------------------------------------------------
 
-    rf_class.rf_class_grid_search(df_stars_train,df_qsos_train,features, label ,param_grid, rand_state, scores, 'SDSSTMASSW1W2')
+    rf_class.rf_class_grid_search(df_stars_train,df_qsos_train,features, label ,param_grid, rand_state, scores, 'SDSSTMASSW1W2_i195')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -411,5 +411,5 @@ def test_example():
 
 
 
-# dr7dr12q_grid_search()
-test_example()
+dr7dr12q_grid_search()
+# test_example()

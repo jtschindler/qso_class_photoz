@@ -41,9 +41,6 @@ def prepare_qso_star_data(df_stars,df_qsos,features,label,rand_state):
     X_train = preprocessing.robust_scale(X_train)
     X_test = preprocessing.robust_scale(X_test)
 
-    print pd.Series(y_train).value_counts()
-    print pd.Series(y_test).value_counts()
-
 
     return X_train,y_train,X_test,y_test
 
@@ -85,12 +82,14 @@ def rf_class_grid_search(df_stars,df_qsos, features, label, param_grid, rand_sta
 
     print X_train.shape, X_test.shape
 
+    print pd.Series(y_train).value_counts() , pd.Series(y_test).value_counts()
+
     for score in scores:
         print("# Tuning hyper-parameters for %s" % score)
         print()
 
         clf = GridSearchCV(RandomForestClassifier(random_state=rand_state),
-            param_grid, cv=10, scoring='%s' % score, n_jobs = 6)
+            param_grid, cv=10, scoring='%s' % score, n_jobs = 2)
 
         clf.fit(X_train, y_train)
 
