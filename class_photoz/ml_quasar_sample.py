@@ -1,7 +1,9 @@
 import pandas as pd
 import numpy as np
 import math
+
 from sklearn import preprocessing
+from sklearn.model_selection import train_test_split
 
 def prepare_flux_ratio_catalog(df,passband_names,sigma=False):
     """ Calculating the flux ratios from the fluxes provided by
@@ -125,3 +127,162 @@ def build_full_sample(df_stars, df_quasars, star_qso_ratio):
         df = pd.concat([qso_sample,star_sample])
 
     return df
+
+
+
+def create_star_labels(df_stars, label_name, star_label):
+    """ This function creates a new column for the stellar classes and either
+    manually deletes objects within certain classes to retain only classes with
+    large numbers of objects or deletes such classes that have less than 400
+    objects. The option is hardcoded in the routine.
+
+    Parameters:
+            df_stars : pandas dataframe
+            Star flux ratio catalog
+
+            label_name : string
+            Name of the new general classification column
+
+            star_label : string
+            Name of the old stellar classification column
+
+    Returns:
+            df_stars : pandas dataframe
+            Updated dataframe with a new star class column and only objects in
+            specified classes.
+    """
+
+    # Create a new column for the stellar classifications and copy them
+    df_stars[label_name] = df_stars[star_label]
+    # Create a list of the names of the star classes
+    star_classes = df_stars[label_name].value_counts().index
+
+    # Exclude classes with less than 400 objects in class
+    # for label in star_labels:
+
+        # if df_stars.class_label.value_counts()[label] < 400:
+        #     df_stars.drop(df_stars.query('class_label == "'+label+'"').index,
+        #                                                         inplace=True)
+
+    # Manually exclude a number of star classes to leave only the ones with
+    # a large number of objects in
+    labels_to_exclude = ['O','B','OB','L','T','WD','CV','Carbon']
+    for label in labels_to_exclude:
+        df_stars.drop(df_stars.query('class_label =="'+str(label)+'"').index,
+                                                            inplace=True)
+
+    # Delete objects with class == "null"
+    df_stars.drop(df_stars.query(str(label_name)+' == "null"').index,
+                                                        inplace=True)
+
+    # Print the value counts for the new star class column
+    print "Stellar classes with new labels: \n"
+    print df_stars[label_name].value_counts()
+
+    return df_stars
+
+
+def create_qso_labels(df_qsos, label_name, z_label):
+    """ This function creates a new column for quasar classes and uses the
+    redshift column specified by z_label to sort the objects into the four
+    redshift classes specified in the routine.
+
+    Parameters:
+            df_qsos : pandas dataframe
+            Quasar flux ratio catalog
+
+            label_name : string
+            Name of the new general classification column
+
+            z_label : string
+            Name of the redshift column
+
+    Returns:
+            df_qsos : pandas dataframe
+            Updated dataframe with a new quasar classification column.
+    """
+
+    # lower and upper redshift boundaries
+    lowz=[0,1.5,2.2,3.5]
+    highz=[1.5,2.2,3.5,10]
+
+    # names of the redshift class labels
+    # labels=['0<z<=1.5','1.5<z<=2.2','2.2<=3.5','3.5<z']
+    labels=['vlowz','lowz','midz','highz']
+
+    # create new column and fill it with the value "null"
+    df_qsos['class_label'] = 'null'
+
+    # Reduce dataframe only to objects that have redshifts in a sane range
+    df_qsos.query('0<'+str(z_label)+'<10',inplace=True)
+
+    # Set the classes using the redshift bins specified above
+    for idx in range(len(lowz)):
+
+        df_qsos.loc[
+                df_qsos.query(str(lowz[idx])+'<'+z_label+'<='+str(highz[idx])).index, \
+            label_name] = labels[idx]
+
+    # Delete objects with class == "null"
+    df_qsos.drop(df_qsos.query(str(label_name)+' == "null"').index,
+                                                        inplace=True)
+
+    # Print the value counts for the new star class column
+    print "Quasar classes with new labels: \n"
+    print df_qsos[label_name].value_counts()
+
+    return df_qsos
+
+
+def make_train_pred_set(df_stars, df_qsos, test_ratio ,rand_state,
+                                                    concat=True, save = False):
+    """ This routine combines the already labelled quasar and star flurx ratio
+    catalogs and creates a training and test set from them with the
+    train_test_split function of scikit-learn.
+
+    Parameters:
+            df_star : pandas dataframe
+            Star flux ratio catalog
+
+            df_qsos : pandas dataframe
+            Quasar flux ratio catalog
+
+            test_ratio : float
+            Ratio of the test set with respect to the total combined catalogs.
+            The value ranges between 0.0 and 1.0.
+
+            rand_state: integer
+            Integer that sets the random state variable for reproducibility
+
+            save : boolean
+            Boolean to select whether the test and training sets are saved
+
+            concat : boolean
+            Boolean to select whether the samples are already concatenated or
+            returned without.
+
+    Returns:
+            df_train : pandas dataframe
+            The new combined training set
+
+            df_test : pandas dataframe
+            The new combined test set
+    """
+
+    stars_train, stars_test = train_test_split(df_stars, test_size=test_ratio,
+                                                    random_state=rand_state)
+
+    qsos_train, qsos_test = train_test_split(df_qsos, test_size=test_ratio,
+                                                    random_state=rand_state)
+
+    df_train = pd.concat([stars_train,qsos_train])
+    df_test = pd.concat([stars_test,qsos_test])
+
+    if save:
+        df_train.to_hdf('train.hdf5','data')
+        df_test.to_hdf('test.hdf5','data')
+
+    if concat:
+        return df_train, df_test
+    else :
+        return stars_train, qsos_train, df_test

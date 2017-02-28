@@ -3,88 +3,88 @@ import pandas as pd
 from scipy.interpolate import LSQUnivariateSpline, UnivariateSpline
 
 
-def prepare_flux_ratio_catalog(df,passband_names,sigma=False):
-    """ Calculating the flux ratios from the fluxes provided by
-        the input df and dropping all rows with NaN values in the
-        process to ensure a full data set.
-
-        Parameters:
-            df : dataframe
-            Dataframe containing the features
-
-            passband_names : list of strings
-            Names of the passbands (features) to be considered
-
-        Returns:
-            model_catalog : dataframe
-            Returns the model catalog without NaN values in all features
-
-            flux_ratio_names : list of strings
-            Names of the flux ratios calculated
-        """
-
-    # Drop all rows with NaN values in the passband considered
-
-    for name in passband_names:
-        df.dropna(axis=0,how='any',subset=['sigma_'+name],inplace=True)
-        print df.shape
-
-    df.dropna(axis=0,how='any',subset=passband_names,inplace=True)
-    print df.shape
-
-    # Calculate the flux ratios and add them to the dataframe
-    flux_ratio_names = []
-    flux_ratio_err_names= []
-
-    if sigma :
-
-        for name in passband_names:
-            df.dropna(axis=0,how='any',subset=['sigma_'+name],inplace=True)
-
-        for i in range(len(passband_names)-1):
-
-            passband_a = np.array(df[passband_names[i]])
-            passband_b = np.array(df[passband_names[i+1]])
-            sigma_a = np.array(df['sigma_'+passband_names[i]])
-            sigma_b = np.array(df['sigma_'+passband_names[i+1]])
-
-            passband_a_name = passband_names[i].split('_')[1]
-            passband_b_name = passband_names[i+1].split('_')[1]
-
-            df[str(passband_a_name+passband_b_name)] = \
-            passband_a / passband_b
-
-            flux_ratio_names.append(str(passband_a_name+passband_b_name))
-
-            df[str('sigma_'+passband_a_name+passband_b_name)] = \
-            np.sqrt((sigma_a/passband_b)**2 + (passband_a/passband_b**2*sigma_b))
-
-            flux_ratio_err_names.append('sigma_'+ \
-            str(passband_a_name+passband_b_name))
-
-    else :
-        for i in range(len(passband_names)-1):
-
-            passband_a = np.array(df[passband_names[i]])
-            passband_b = np.array(df[passband_names[i+1]])
-            # sigma_a = np.array(df['sigma_'+passband_names[i]])
-            # sigma_b = np.array(df['sigma_'+passband_names[i+1]])
-
-            passband_a_name = passband_names[i].split('_')[1]
-            passband_b_name = passband_names[i+1].split('_')[1]
-
-            df[str(passband_a_name+passband_b_name)] = \
-            passband_a / passband_b
-
-            flux_ratio_names.append(str(passband_a_name+passband_b_name))
-
-            # df[str('sigma_'+passband_a_name+passband_b_name)] = \
-            # np.sqrt((sigma_a/passband_b)**2 + (passband_a/passband_b**2*sigma_b))
-
-            # flux_ratio_err_names.append('sigma_'+ \
-            # str(passband_a_name+passband_b_name))
-
-    return df, flux_ratio_names
+# def prepare_flux_ratio_catalog(df,passband_names,sigma=False):
+#     """ Calculating the flux ratios from the fluxes provided by
+#         the input df and dropping all rows with NaN values in the
+#         process to ensure a full data set.
+#
+#         Parameters:
+#             df : dataframe
+#             Dataframe containing the features
+#
+#             passband_names : list of strings
+#             Names of the passbands (features) to be considered
+#
+#         Returns:
+#             model_catalog : dataframe
+#             Returns the model catalog without NaN values in all features
+#
+#             flux_ratio_names : list of strings
+#             Names of the flux ratios calculated
+#         """
+#
+#     # Drop all rows with NaN values in the passband considered
+#
+#     for name in passband_names:
+#         df.dropna(axis=0,how='any',subset=['sigma_'+name],inplace=True)
+#         print df.shape
+#
+#     df.dropna(axis=0,how='any',subset=passband_names,inplace=True)
+#     print df.shape
+#
+#     # Calculate the flux ratios and add them to the dataframe
+#     flux_ratio_names = []
+#     flux_ratio_err_names= []
+#
+#     if sigma :
+#
+#         for name in passband_names:
+#             df.dropna(axis=0,how='any',subset=['sigma_'+name],inplace=True)
+#
+#         for i in range(len(passband_names)-1):
+#
+#             passband_a = np.array(df[passband_names[i]])
+#             passband_b = np.array(df[passband_names[i+1]])
+#             sigma_a = np.array(df['sigma_'+passband_names[i]])
+#             sigma_b = np.array(df['sigma_'+passband_names[i+1]])
+#
+#             passband_a_name = passband_names[i].split('_')[1]
+#             passband_b_name = passband_names[i+1].split('_')[1]
+#
+#             df[str(passband_a_name+passband_b_name)] = \
+#             passband_a / passband_b
+#
+#             flux_ratio_names.append(str(passband_a_name+passband_b_name))
+#
+#             df[str('sigma_'+passband_a_name+passband_b_name)] = \
+#             np.sqrt((sigma_a/passband_b)**2 + (passband_a/passband_b**2*sigma_b))
+#
+#             flux_ratio_err_names.append('sigma_'+ \
+#             str(passband_a_name+passband_b_name))
+#
+#     else :
+#         for i in range(len(passband_names)-1):
+#
+#             passband_a = np.array(df[passband_names[i]])
+#             passband_b = np.array(df[passband_names[i+1]])
+#             # sigma_a = np.array(df['sigma_'+passband_names[i]])
+#             # sigma_b = np.array(df['sigma_'+passband_names[i+1]])
+#
+#             passband_a_name = passband_names[i].split('_')[1]
+#             passband_b_name = passband_names[i+1].split('_')[1]
+#
+#             df[str(passband_a_name+passband_b_name)] = \
+#             passband_a / passband_b
+#
+#             flux_ratio_names.append(str(passband_a_name+passband_b_name))
+#
+#             # df[str('sigma_'+passband_a_name+passband_b_name)] = \
+#             # np.sqrt((sigma_a/passband_b)**2 + (passband_a/passband_b**2*sigma_b))
+#
+#             # flux_ratio_err_names.append('sigma_'+ \
+#             # str(passband_a_name+passband_b_name))
+#
+#     return df, flux_ratio_names
 
 
 def build_full_sample(df_stars, df_quasars, star_qso_ratio,return_cats=False):

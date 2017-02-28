@@ -7,47 +7,6 @@ from class_photoz import ml_sets as sets
 from class_photoz import rf_class as rf_class
 
 
-def create_labels(df_stars, df_quasars,z_label):
-
-    df_stars['class_label'] = df_stars.star_class
-
-    star_labels = df_stars.class_label.value_counts().index
-
-    # for label in star_labels:
-
-        # if df_stars.class_label.value_counts()[label] < 400:
-        #     df_stars.drop(df_stars.query('class_label == "'+label+'"').index,
-        #                                                         inplace=True)
-
-
-
-    labels_to_exclude = ['O','B','OB','L','T','WD','CV','Carbon']
-    for label in labels_to_exclude:
-        df_stars.drop(df_stars.query('class_label =="'+str(label)+'"').index,
-                                                            inplace=True)
-
-    df_stars.drop(df_stars.query('class_label == "null"').index,
-                                                        inplace=True)
-
-    lowz=[0,1.5,2.2,3.5]
-    highz=[1.5,2.2,3.5,10]
-    # labels=['0<z<=1.5','1.5<z<=2.2','2.2<=3.5','3.5<z']
-    labels=['vlowz','lowz','midz','highz']
-    df_quasars['class_label'] = 'null'
-    df_quasars.query('0<'+str(z_label)+'<10',inplace=True)
-    for idx in range(len(lowz)):
-
-        df_quasars.loc[
-                df_quasars.query(str(lowz[idx])+'<'+z_label+'<='+str(highz[idx])).index, \
-                'class_label'] = labels[idx]
-
-    print df_quasars.class_label.value_counts()
-    print df_stars.class_label.value_counts()
-
-    return df_stars,df_quasars
-
-
-
 
 
 def dr7dr12q_grid_search():
@@ -67,19 +26,21 @@ def dr7dr12q_grid_search():
     scores = ['f1_weighted']
 
     # Restrict the data set
-    df_stars.query('SDSS_mag_i <= 22',inplace=True)
-    df_quasars.query('SDSS_mag_i <=22',inplace=True)
+    df_stars.query('SDSS_mag_i <= 19.5',inplace=True)
+    df_quasars.query('SDSS_mag_i <=19.5',inplace=True)
 
     # Create basic classes
     df_quasars['label']='QSO'
     df_stars['label']='STAR'
 
     #Create more detailed classes
-    df_stars, df_quasars = create_labels(df_stars, df_quasars,'Z_VI')
+    df_quasars = qs.create_qso_labels(df_quasars, 'class_label', 'Z_VI')
+    df_stars = qs.create_star_labels(df_stars, 'class_label', 'star_class')
+
 
     # FOR TESTING PURPOSES
-    # df_stars = df_stars.sample(frac=0.2)
-    # df_quasars = df_quasars.sample(frac=0.2)
+    df_stars = df_stars.sample(frac=0.2)
+    df_quasars = df_quasars.sample(frac=0.2)
 
     # --------------------------------------------------------------------------
     # Preparation of training set
@@ -95,12 +56,15 @@ def dr7dr12q_grid_search():
     df_stars_train = df_stars.copy(deep=True)
     df_qsos_train = df_quasars.copy(deep=True)
 
+    label = 'class_label'
+
     df_stars_train,features = qs.prepare_flux_ratio_catalog(df_stars_train,passband_names)
     df_qsos_train,features = qs.prepare_flux_ratio_catalog(df_qsos_train,passband_names)
 
+    df_train, df_pred = qs.make_train_pred_set(df_stars_train, df_qsos_train, 0.2 ,rand_state)
 
     #Choose label: 'label' = 2 classes, 'class_label'= multiple classes
-    label = 'class_label'
+
 
     features = ['SDSS_i','ug','gr','ri','iz']
 
@@ -108,7 +72,7 @@ def dr7dr12q_grid_search():
     # Random Forest Regression Grid Search
     # --------------------------------------------------------------------------
 
-    rf_class.rf_class_grid_search(df_stars_train,df_qsos_train,features, label ,param_grid, rand_state, scores, 'test')
+    rf_class.rf_class_grid_search(df_train, df_pred, features, label ,param_grid, rand_state, scores, 'test')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -126,15 +90,17 @@ def dr7dr12q_grid_search():
                         'WISE_w1','WISE_w2', \
                         ]
 
+    label = 'class_label'
+
+
     df_stars_train = df_stars.copy(deep=True)
     df_qsos_train = df_quasars.copy(deep=True)
 
     df_stars_train,features = qs.prepare_flux_ratio_catalog(df_stars_train,passband_names)
     df_qsos_train,features = qs.prepare_flux_ratio_catalog(df_qsos_train,passband_names)
 
-
+    df_train, df_pred = qs.make_train_pred_set(df_stars_train, df_qsos_train, 0.2 ,rand_state)
     #Choose label: 'label' = 2 classes, 'class_label'= multiple classes
-    label = 'class_label'
 
     features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
 
@@ -142,7 +108,7 @@ def dr7dr12q_grid_search():
     # Random Forest Regression Grid Search
     # --------------------------------------------------------------------------
 
-    rf_class.rf_class_grid_search(df_stars_train,df_qsos_train,features, label ,param_grid, rand_state, scores, 'test')
+    rf_class.rf_class_grid_search(df_train, df_pred, features, label ,param_grid, rand_state, scores, 'test')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -160,15 +126,19 @@ def dr7dr12q_grid_search():
                         'WISE_w1','WISE_w2', \
                         ]
 
+    label = 'class_label'
+
+
     df_stars_train = df_stars.copy(deep=True)
     df_qsos_train = df_quasars.copy(deep=True)
 
     df_stars_train,features = qs.prepare_flux_ratio_catalog(df_stars_train,passband_names)
     df_qsos_train,features = qs.prepare_flux_ratio_catalog(df_qsos_train,passband_names)
 
+    df_train, df_pred = qs.make_train_pred_set(df_stars_train, df_qsos_train, 0.2 ,rand_state)
 
     #Choose label: 'label' = 2 classes, 'class_label'= multiple classes
-    label = 'class_label'
+
 
     features = ['SDSS_i','WISE_w1','TMASS_j','ug','gr','ri','iz','zj','jh',  \
                 'hk', 'kw1', 'w1w2']
@@ -177,7 +147,7 @@ def dr7dr12q_grid_search():
     # Random Forest Regression Grid Search
     # --------------------------------------------------------------------------
 
-    rf_class.rf_class_grid_search(df_stars_train,df_qsos_train,features, label ,param_grid, rand_state, scores, 'SDSSTMASSW1W2_i195')
+    rf_class.rf_class_grid_search(df_train, df_pred, features, label ,param_grid, rand_state, scores, 'SDSSTMASSW1W2_i195')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -359,8 +329,8 @@ def test_example():
 
 
     #Reduce the total set of objects for testing the routines
-    df_stars = df_stars.sample(frac=1.0)
-    df_quasars = df_quasars.sample(frac=1.0)
+    # df_stars = df_stars.sample(frac=0.2)
+    # df_quasars = df_quasars.sample(frac=0.2)
 
 
 
@@ -379,7 +349,7 @@ def test_example():
 
 
     df_stars.query('SDSS_mag_i <= 18.5',inplace=True)
-    df_quasars.query('SDSS_mag_i <=18.5',inplace=True)
+    df_quasars.query('SDSS_mag_i <= 18.5',inplace=True)
     #df_quasars.query('obsMag_SDSS_i <= 18.5',inplace=True)
     print "Stars: ",df_stars.shape
     print "Quasars: ",df_quasars.shape
@@ -387,6 +357,8 @@ def test_example():
     #Create more detailed classes
     df_stars, df_quasars = create_labels(df_stars, df_quasars,'z')
 
+    # Make test and training set
+    df_train, df_pred = make_train_pred_set(df_stars, df_quasars, 'class_label', rand_state = 1)
 
     # Build a test sample with a given QSO to STAR ratio
     # df = qs.build_full_sample(df_stars, df_quasars, 20)
@@ -412,7 +384,7 @@ def test_example():
 
     rand_state=1
 
-    rf_class.rf_multiclass_example(df_stars, df_quasars, features, label, params,rand_state)
+    rf_class.rf_class_example(df_train, df_pred, features, label, params,rand_state)
 
 
 
