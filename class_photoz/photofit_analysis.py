@@ -3,32 +3,71 @@ import numpy as np
 import matplotlib
 from matplotlib.colors import LogNorm
 
+import sklearn.metrics as met
+from class_photoz import photoz_analysis as pz_an
+from class_photoz import ml_analysis as ml_an
+
 # pdf plot
 # flux_ratio redshift relation plots for model catalog
 # flux_ratio redshift relation with median and/or spline
+
+def photoz_analysis(df_pred, z_label_pred, z_label_true):
+
+    df = df_pred.copy(deep=True)
+    df = df.query('bin_class_true == "QSO"')
+
+    z_true = df[z_label_true].values
+    z_pred = df[z_label_pred].values
+
+    print("The r2 score for the Photometric Redshift Estimation is:\t"),  met.r2_score(z_true, z_pred)
+
+    pz_an.plot_redshifts(z_true,z_pred)
+    pz_an.plot_error_hist(z_true,z_pred)
+
+    plt.show()
+
+def classification_analysis(y_true,y_pred,labels):
+
+    print("Detailed classification report:")
+    print()
+    print("The model is trained on the training set.")
+    print("The scores are computed on the test set.")
+    print()
+    y_true = y_true.astype('string')
+    y_pred = y_pred.astype('string')
+
+    print(met.classification_report(y_true, y_pred))
+    print()
+
+    cnf_matrix = met.confusion_matrix(y_true, y_pred, labels=labels, sample_weight=None)
+
+    ml_an.plot_confusion_matrix(cnf_matrix, classes=labels, normalize=True,
+                      title='Confusion matrix, with normalization')
+
+    ml_an.plot_confusion_matrix(cnf_matrix, classes=labels, normalize=False,
+                      title='Confusion matrix, without normalization')
+
+
+    plt.show()
 
 
 def set_pred_classes(df_pred):
 
     # if qso redchisq < star redchisq set mult class to star class
-    df_pred.loc[
-        df_pred.query('pf_qso_redchisq < pf_star_redchisq').index ,
-         'mult_class_pred'] = \
-         df_pred.query('pf_qso_redchisq < pf_star_redchisq')['qso_class']
+    idx =  df_pred.query('pf_qso_redchisq < pf_star_redchisq').index
+    df_pred.loc[ idx, 'mult_class_pred'] = df_pred.loc[idx,'qso_class']
 
     # if qso redchisq >= star redchisq set mult class to qso class
-    df_pred.loc[
-        df_pred.query('pf_qso_redchisq >= pf_star_redchisq').index ,
-         'mult_class_pred'] = \
-         df_pred.query('pf_qso_redchisq >= pf_star_redchisq')['pf_star_class']
+    idx =  df_pred.query('pf_qso_redchisq >= pf_star_redchisq').index
+    df_pred.loc[ idx, 'mult_class_pred'] = df_pred.loc[idx,'pf_star_class']
 
     # if qso redchisq < star redchisq set binary class to QSO
-    df_pred.loc[df_pred.query('pf_qso_redchisq < pf_star_redchisq').index ,
-     'bin_class_pred'] = 'QSO'
+    idx =  df_pred.query('pf_qso_redchisq < pf_star_redchisq').index
+    df_pred.loc[idx, 'bin_class_pred'] = 'QSO'
 
     # if qso redchisq >= star redchisq set binary class to STAR
-    df_pred.loc[df_pred.query('pf_qso_redchisq >= pf_star_redchisq').index ,
-     'bin_class_pred'] = 'STAR'
+    idx =  df_pred.query('pf_qso_redchisq >= pf_star_redchisq').index
+    df_pred.loc[ idx, 'bin_class_pred'] = 'STAR'
 
     return df_pred
 

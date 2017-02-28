@@ -22,12 +22,12 @@ def dr7dr12q_grid_search():
                     # 'max_depth' : [15,20,25]}]
     param_grid = [{'n_estimators': [100], 'min_samples_split': [2],
                     'max_depth' : [20]}]
-    rand_state=2
+    rand_state=1
     scores = ['f1_weighted']
 
     # Restrict the data set
-    df_stars.query('SDSS_mag_i <= 19.5',inplace=True)
-    df_quasars.query('SDSS_mag_i <=19.5',inplace=True)
+    df_stars.query('SDSS_mag_i <= 21.5',inplace=True)
+    df_quasars.query('SDSS_mag_i <= 21.5',inplace=True)
 
     # Create basic classes
     df_quasars['label']='QSO'
@@ -39,8 +39,8 @@ def dr7dr12q_grid_search():
 
 
     # FOR TESTING PURPOSES
-    df_stars = df_stars.sample(frac=0.2)
-    df_quasars = df_quasars.sample(frac=0.2)
+    # df_stars = df_stars.sample(frac=0.2)
+    # df_quasars = df_quasars.sample(frac=0.2)
 
     # --------------------------------------------------------------------------
     # Preparation of training set
@@ -61,7 +61,7 @@ def dr7dr12q_grid_search():
     df_stars_train,features = qs.prepare_flux_ratio_catalog(df_stars_train,passband_names)
     df_qsos_train,features = qs.prepare_flux_ratio_catalog(df_qsos_train,passband_names)
 
-    df_train, df_pred = qs.make_train_pred_set(df_stars_train, df_qsos_train, 0.2 ,rand_state)
+    df_train, df_pred = qs.make_train_pred_set(df_stars_train, df_qsos_train, 0.2 ,rand_state, 'i19_5_')
 
     #Choose label: 'label' = 2 classes, 'class_label'= multiple classes
 

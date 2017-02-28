@@ -3,7 +3,7 @@ from time import gmtime, strftime
 
 
 
-def calc_star_class_pdf_binned(flux_model,obj_catalog,flux_ratio_names):
+def calc_star_class_pdf_binned(flux_model,obj_catalog,flux_ratio_names,label):
     """This function calculates the chi^2 values and probabilities for each
     entry in the flux_model to each object in the obj_catalog and saves them in
     a list of arrays.
@@ -19,6 +19,9 @@ def calc_star_class_pdf_binned(flux_model,obj_catalog,flux_ratio_names):
 
         flux_ratio_names : list of strings
         Names of the flux ratios to consider
+
+        label : string
+        Column name of the stellar classes
 
     Returns:
         pdf_array : list of arrays [ [star_class, class_counts],
@@ -44,7 +47,7 @@ def calc_star_class_pdf_binned(flux_model,obj_catalog,flux_ratio_names):
     # The probability density function array consists of two parts
     # The first object in the list consists of the bin_data
     # The second object in the list consists of all pdfs
-    pdf_array = [np.array(flux_model[['star_class','class_counts']]),arr,arr2]
+    pdf_array = [np.array(flux_model[[label,'class_counts']]),arr,arr2]
 
     # Calculating the probabilities
     # obj_fr = object flux ratios

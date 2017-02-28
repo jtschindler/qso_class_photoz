@@ -234,8 +234,8 @@ def create_qso_labels(df_qsos, label_name, z_label):
     return df_qsos
 
 
-def make_train_pred_set(df_stars, df_qsos, test_ratio ,rand_state,
-                                                    concat=True, save = False):
+def make_train_pred_set(df_stars, df_qsos, test_ratio ,rand_state, save_prefix,
+                                concat=True, save = False):
     """ This routine combines the already labelled quasar and star flurx ratio
     catalogs and creates a training and test set from them with the
     train_test_split function of scikit-learn.
@@ -279,8 +279,8 @@ def make_train_pred_set(df_stars, df_qsos, test_ratio ,rand_state,
     df_test = pd.concat([stars_test,qsos_test])
 
     if save:
-        df_train.to_hdf('train.hdf5','data')
-        df_test.to_hdf('test.hdf5','data')
+        df_train.to_hdf(str(save_prefix)+'train.hdf5','data')
+        df_test.to_hdf(str(save_prefix)+'test.hdf5','data')
 
     if concat:
         return df_train, df_test

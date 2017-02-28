@@ -9,7 +9,7 @@ from sklearn.metrics import r2_score
 from sklearn.metrics import f1_score
 
 from class_photoz import photofit_photoz as pfz
-from class_photoz import photoz_analysis as pz_an
+from class_photoz import photofit_analysis as pf_an
 from class_photoz import photofit_find_star_class as pfsc
 
 from class_photoz import ml_analysis as ml_an
@@ -337,13 +337,13 @@ def star_fit(df_train, df_pred, features, class_label, params):
     # Calculate the chi-squared probability distribution
 
     pdf_array = pfsc.calc_star_class_pdf_binned(star_model,df_pred,
-                                                            features)
+                                                    features, class_label)
 
     # Determine the stellar class
     df_pred = pfsc.find_max_prob_star(pdf_array,df_pred)
 
-    pdf_prob = pd.DataFrame(pdf_array[1],index=df_pred.index,columns=star_model.star_class)
-    pdf_chisq = pd.DataFrame(pdf_array[2],index=df_pred.index,columns=star_model.star_class)
+    pdf_prob = pd.DataFrame(pdf_array[1],index=df_pred.index,columns=star_model[class_label])
+    pdf_chisq = pd.DataFrame(pdf_array[2],index=df_pred.index,columns=star_model[class_label])
 
 
     return df_pred, pdf_prob, pdf_chisq, star_model
@@ -392,22 +392,27 @@ def photoz_fit_test(df, features, z_label, params, rand_state, save_data=False,
             photoz_fit(df_train,df_test,features, z_label, params)
 
     # Analyze the best-fitting redshift
-    y_true = df_test[z_label].values
-    y_pred = df_test.pf_photoz.values
 
-    print r2_score(y_true, y_pred)
+    pf_an.photoz_analysis(df_test, pf_photoz ,z_label)
 
-    pz_an.plot_redshifts(y_true,y_pred)
-    pz_an.plot_error_hist(y_true,y_pred)
+    pf_an.photoz_analysis(df_test, peak_a_mode ,z_label)
 
-    plt.show()
-    y_true = df_test[z_label].values
-    y_pred = df_test.peak_a_mode.values
-
-    print r2_score(y_true, y_pred)
-
-    pz_an.plot_redshifts(y_true,y_pred)
-    pz_an.plot_error_hist(y_true,y_pred)
+    # y_true = df_test[z_label].values
+    # y_pred = df_test.pf_photoz.values
+    #
+    # print r2_score(y_true, y_pred)
+    #
+    # pz_an.plot_redshifts(y_true,y_pred)
+    # pz_an.plot_error_hist(y_true,y_pred)
+    #
+    # plt.show()
+    # y_true = df_test[z_label].values
+    # y_pred = df_test.peak_a_mode.values
+    #
+    # print r2_score(y_true, y_pred)
+    #
+    # pz_an.plot_redshifts(y_true,y_pred)
+    # pz_an.plot_error_hist(y_true,y_pred)
 
 
     # Save results of the chi-squared fitting process if selected
