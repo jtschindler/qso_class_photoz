@@ -89,7 +89,7 @@ def rf_class_grid_search(df_stars,df_qsos, features, label, param_grid, rand_sta
         print()
 
         clf = GridSearchCV(RandomForestClassifier(random_state=rand_state),
-            param_grid, cv=10, scoring='%s' % score, n_jobs = 2)
+            param_grid, cv=5, scoring='%s' % score, n_jobs = 6)
 
         clf.fit(X_train, y_train)
 
@@ -99,6 +99,9 @@ def rf_class_grid_search(df_stars,df_qsos, features, label, param_grid, rand_sta
         print("The scores are computed on the test set.")
         print()
         y_true, y_pred = y_test, clf.predict(X_test)
+        y_true = y_true.astype('string')
+        y_pred = y_pred.astype('string')
+
         print(classification_report(y_true, y_pred))
         print()
 
@@ -116,12 +119,7 @@ def rf_class_grid_search(df_stars,df_qsos, features, label, param_grid, rand_sta
         print()
         df = pd.DataFrame(clf.cv_results_)
         df.to_hdf('RF_GS_CLASS_'+name+'_'+score+'.hdf5','data')
-        print()
-        print("The model is trained on the full development set (80%).")
-        print("The scores are computed on the full evaluation set (20%).")
-        print()
-        y_true, y_pred = y_test, clf.predict(X_test)
-        print()
+
 
 
 def rf_class_validation_curve(df, features, label, params, param_name, param_range):

@@ -13,20 +13,26 @@ def create_labels(df_stars, df_quasars,z_label):
 
     star_labels = df_stars.class_label.value_counts().index
 
-    for label in star_labels:
+    # for label in star_labels:
 
-        if df_stars.class_label.value_counts()[label] < 400:
-            df_stars.drop(df_stars.query('class_label == "'+label+'"').index,
-                                                                inplace=True)
+        # if df_stars.class_label.value_counts()[label] < 400:
+        #     df_stars.drop(df_stars.query('class_label == "'+label+'"').index,
+        #                                                         inplace=True)
 
 
+
+    labels_to_exclude = ['O','B','OB','L','T','WD','CV','Carbon']
+    for label in labels_to_exclude:
+        df_stars.drop(df_stars.query('class_label =="'+str(label)+'"').index,
+                                                            inplace=True)
 
     df_stars.drop(df_stars.query('class_label == "null"').index,
                                                         inplace=True)
 
     lowz=[0,1.5,2.2,3.5]
     highz=[1.5,2.2,3.5,10]
-    labels=['0<z<=1.5','1.5<z<=2.2','2.2<=3.5','3.5<z']
+    # labels=['0<z<=1.5','1.5<z<=2.2','2.2<=3.5','3.5<z']
+    labels=['vlowz','lowz','midz','highz']
     df_quasars['class_label'] = 'null'
     df_quasars.query('0<'+str(z_label)+'<10',inplace=True)
     for idx in range(len(lowz)):
@@ -53,16 +59,16 @@ def dr7dr12q_grid_search():
     df_stars = pd.read_hdf('../class_photoz/data/DR13_stars_clean_flux_cat.hdf5','data')
     df_quasars = pd.read_hdf('../class_photoz/data/DR7DR12Q_clean_flux_cat.hdf5','data')
 
-    param_grid = [{'n_estimators': [50,100,200,300], 'min_samples_split': [2,3,4],
-                    'max_depth' : [15,20,25]}]
-    # param_grid = [{'n_estimators': [50,100], 'min_samples_split': [2,3],
-    #                 'max_depth' : [20,25]}]
-    rand_state=1
+    # param_grid = [{'n_estimators': [100,200,300], 'min_samples_split': [2,3,4],
+                    # 'max_depth' : [15,20,25]}]
+    param_grid = [{'n_estimators': [100], 'min_samples_split': [2],
+                    'max_depth' : [20]}]
+    rand_state=2
     scores = ['f1_weighted']
 
     # Restrict the data set
-    df_stars.query('SDSS_mag_i <= 19.5',inplace=True)
-    df_quasars.query('SDSS_mag_i <=19.5',inplace=True)
+    df_stars.query('SDSS_mag_i <= 22',inplace=True)
+    df_quasars.query('SDSS_mag_i <=22',inplace=True)
 
     # Create basic classes
     df_quasars['label']='QSO'
@@ -102,7 +108,7 @@ def dr7dr12q_grid_search():
     # Random Forest Regression Grid Search
     # --------------------------------------------------------------------------
 
-    rf_class.rf_class_grid_search(df_stars_train,df_qsos_train,features, label ,param_grid, rand_state, scores, 'SDSS_i195')
+    rf_class.rf_class_grid_search(df_stars_train,df_qsos_train,features, label ,param_grid, rand_state, scores, 'test')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -136,7 +142,7 @@ def dr7dr12q_grid_search():
     # Random Forest Regression Grid Search
     # --------------------------------------------------------------------------
 
-    rf_class.rf_class_grid_search(df_stars_train,df_qsos_train,features, label ,param_grid, rand_state, scores, 'SDSSW1W2_i195')
+    rf_class.rf_class_grid_search(df_stars_train,df_qsos_train,features, label ,param_grid, rand_state, scores, 'test')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------

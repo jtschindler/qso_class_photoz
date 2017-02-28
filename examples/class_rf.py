@@ -15,7 +15,7 @@ def create_labels(df_stars, df_quasars,z_label):
 
     for label in star_labels:
 
-        if df_stars.class_label.value_counts()[label] < 10:
+        if df_stars.class_label.value_counts()[label] < 400:
             df_stars.drop(df_stars.query('class_label == "'+label+'"').index,
                                                                 inplace=True)
 
