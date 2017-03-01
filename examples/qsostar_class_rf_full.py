@@ -6,7 +6,31 @@ from class_photoz import ml_quasar_sample as qs
 from class_photoz import ml_sets as sets
 from class_photoz import rf_class as rf_class
 
+def load_file_grid_search():
 
+    # --------------------------------------------------------------------------
+    # General input parameters
+    # --------------------------------------------------------------------------
+
+    # param_grid = [{'n_estimators': [100,200,300], 'min_samples_split': [2,3,4],
+                    # 'max_depth' : [15,20,25]}]
+    param_grid = [{'n_estimators': [100], 'min_samples_split': [2],
+                    'max_depth' : [20]}]
+
+    rand_state=1
+    scores = ['f1_weighted']
+    label = 'mult_class_true'
+
+    # --------------------------------------------------------------------------
+    # Loading the training and test sets and performing the RF GS
+    # --------------------------------------------------------------------------
+    df_train = pd.read_hdf('SDSSW1W2_emp_i18_5_train.hdf5','data')
+    df_pred = pd.read_hdf('SDSSW1W2_emp_i18_5_test.hdf5','data')
+
+    print df_train[label].value_counts()
+
+    features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
+    rf_class.rf_class_grid_search(df_train, df_pred, features, label ,param_grid, rand_state, scores, 'test')
 
 
 def dr7dr12q_grid_search():
@@ -389,5 +413,6 @@ def test_example():
 
 
 
-dr7dr12q_grid_search()
+# dr7dr12q_grid_search()
+load_file_grid_search()
 # test_example()

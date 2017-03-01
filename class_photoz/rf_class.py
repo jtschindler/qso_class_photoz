@@ -85,7 +85,7 @@ def rf_class_grid_search(df_train,df_pred, features, label, param_grid, rand_sta
         print()
 
         clf = GridSearchCV(RandomForestClassifier(random_state=rand_state),
-            param_grid, cv=5, scoring='%s' % score, n_jobs = 3)
+            param_grid, cv=5, scoring='%s' % score, n_jobs = 6)
 
         clf.fit(X_train, y_train)
 

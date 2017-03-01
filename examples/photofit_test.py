@@ -131,11 +131,11 @@ def test_full_fit():
     rand_state = 1
 
     params = {'binning' : 'minimum',
-        'bin_param' : 20,
+        'bin_param' : 50,
         'model_type' : 'median'}
 
-    df_qsos = df_qsos.query('SDSS_mag_i < 21.5')
-    df_stars = df_stars.query('SDSS_mag_i < 21.5')
+    df_qsos = df_qsos.query('SDSS_mag_i < 18.5')
+    df_stars = df_stars.query('SDSS_mag_i < 18.5')
 
     df_stars = qs.create_star_labels(df_stars, star_label, 'star_class')
 
@@ -160,8 +160,8 @@ def test_full_fit():
     passband_names, sigma=True)
 
     df_train_stars, df_train_qsos, df_test = \
-            qs.make_train_pred_set(df_stars, df_qsos, 0.2, rand_state, 'emp_i18_5_',
-                                                    concat=False, save = False)
+            qs.make_train_pred_set(df_stars, df_qsos, 0.2, rand_state, 'SDSSW1W2_emp_i18_5_',
+                                                    concat=False, save = True)
 
     print df_train_stars.mult_class_true.value_counts()
     print df_train_qsos.mult_class_true.value_counts()
@@ -180,14 +180,14 @@ def test_full_fit():
 
     df_test = pf_an.set_pred_classes(df_test)
 
-    df_test.to_hdf('test_set.hdf5','data')
+    df_test.to_hdf('photofit_SDSSW1W2_emp_i18_5.hdf5','data')
 
     full_analysis(df_test)
 
 
 
 
-# test_full_fit()
+test_full_fit()
 
 # test_star_fit()
 # test_photoz()
