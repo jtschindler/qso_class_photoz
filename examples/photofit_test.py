@@ -25,6 +25,8 @@ def full_analysis(df_test):
 
     pf_an.photoz_analysis(df_test, 'pf_photoz', 'Z_VI')
 
+    pf_an.photoz_analysis(df_test, 'peak_a_mode', 'Z_VI')
+
     print df_test.mult_class_true.value_counts()
     print df_test.mult_class_pred.value_counts()
 
@@ -146,13 +148,12 @@ def test_full_fit():
     df_qsos = pf_an.set_redshift_classes(df_qsos, 'Z_VI', 'mult_class_true')
 
     #specify passband and other column names for model file
-    passband_names = ['SDSS_u',\
-            'SDSS_g',\
-            'SDSS_r',\
-            'SDSS_i',\
-            'SDSS_z',\
-            'WISE_w1',\
-            'WISE_w2']
+    passband_names = ['SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
+                        # 'TMASS_j', \
+                        # 'TMASS_h', \
+                        # 'TMASS_k', \
+                        # 'WISE_w1','WISE_w2', \
+                        ]
 
     df_stars, features  =  qs.prepare_flux_ratio_catalog(df_stars, \
     passband_names, sigma=True)
@@ -160,7 +161,7 @@ def test_full_fit():
     passband_names, sigma=True)
 
     df_train_stars, df_train_qsos, df_test = \
-            qs.make_train_pred_set(df_stars, df_qsos, 0.2, rand_state, 'SDSSW1W2_emp_i18_5_',
+            qs.make_train_pred_set(df_stars, df_qsos, 0.2, rand_state, 'SDSSTMASSW1W2_emp_i18_5_',
                                                     concat=False, save = True)
 
     print df_train_stars.mult_class_true.value_counts()
@@ -180,14 +181,16 @@ def test_full_fit():
 
     df_test = pf_an.set_pred_classes(df_test)
 
-    df_test.to_hdf('photofit_SDSSW1W2_emp_i18_5.hdf5','data')
+    df_test.to_hdf('photofit_SDSS_emp_i18_5.hdf5','data')
 
     full_analysis(df_test)
 
 
 
 
-test_full_fit()
+df = pd.read_hdf('photofit_SDSSTMASSW1W2_emp_i18_5.hdf5','data')
+full_analysis(df)
+# test_full_fit()
 
 # test_star_fit()
 # test_photoz()
