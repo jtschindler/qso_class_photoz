@@ -55,7 +55,7 @@ def set_pred_classes(df_pred):
 
     # if qso redchisq < star redchisq set mult class to star class
     idx =  df_pred.query('pf_qso_redchisq < pf_star_redchisq').index
-    df_pred.loc[ idx, 'mult_class_pred'] = df_pred.loc[idx,'qso_class']
+    df_pred.loc[ idx, 'mult_class_pred'] = df_pred.loc[idx,'pf_qso_class']
 
     # if qso redchisq >= star redchisq set mult class to qso class
     idx =  df_pred.query('pf_qso_redchisq >= pf_star_redchisq').index

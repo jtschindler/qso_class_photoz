@@ -168,7 +168,7 @@ def create_star_labels(df_stars, label_name, star_label):
     # a large number of objects in
     labels_to_exclude = ['O','B','OB','L','T','WD','CV','Carbon']
     for label in labels_to_exclude:
-        df_stars.drop(df_stars.query('class_label =="'+str(label)+'"').index,
+        df_stars.drop(df_stars.query(str(label_name)+' =="'+str(label)+'"').index,
                                                             inplace=True)
 
     # Delete objects with class == "null"
@@ -211,7 +211,7 @@ def create_qso_labels(df_qsos, label_name, z_label):
     labels=['vlowz','lowz','midz','highz']
 
     # create new column and fill it with the value "null"
-    df_qsos['class_label'] = 'null'
+    df_qsos[label_name] = 'null'
 
     # Reduce dataframe only to objects that have redshifts in a sane range
     df_qsos.query('0<'+str(z_label)+'<10',inplace=True)
@@ -234,8 +234,8 @@ def create_qso_labels(df_qsos, label_name, z_label):
     return df_qsos
 
 
-def make_train_pred_set(df_stars, df_qsos, test_ratio ,rand_state, save_prefix,
-                                concat=True, save = False):
+def make_train_pred_set(df_stars, df_qsos, test_ratio ,rand_state,
+                    save_prefix = 'default', concat=True, save = False):
     """ This routine combines the already labelled quasar and star flurx ratio
     catalogs and creates a training and test set from them with the
     train_test_split function of scikit-learn.

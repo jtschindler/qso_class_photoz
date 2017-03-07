@@ -284,6 +284,8 @@ def rf_class_example(df_train, df_pred, features, label, params, rand_state):
 
     X_pred, y_true = sets.build_matrices(df_pred, features,label=label)
 
+    y_true = y_true.astype('string')
+    y_pred = y_pred.astype('string')
 
     feat_importances = clf.feature_importances_
 
@@ -303,8 +305,12 @@ def rf_class_example(df_train, df_pred, features, label, params, rand_state):
     ml_an.plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=True,
                       title='Confusion matrix, with normalization')
 
+    ml_an.plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=False,
+                      title='Confusion matrix, without normalization')
 
     plt.show()
+
+    return y_true, y_pred
 
 
 

@@ -2,9 +2,13 @@ import numpy as np
 import pandas as pd
 import math
 
+from sklearn.metrics import confusion_matrix
+
 from class_photoz import ml_quasar_sample as qs
 from class_photoz import ml_sets as sets
 from class_photoz import rf_class as rf_class
+from class_photoz import ml_analysis as ml_an
+from class_photoz import photofit_analysis as pf_an
 
 def load_file_grid_search():
 
@@ -316,11 +320,14 @@ def simqsos_grid_search():
 
 
 
-def test_example():
 
+def full_test():
+    # --------------------------------------------------------------------------
+    # Loading and preparing the data files
+    # --------------------------------------------------------------------------
     df_stars = pd.read_hdf('../class_photoz/data/DR13_stars_clean_flux_cat.hdf5','data')
-    df_quasars = pd.read_hdf('../class_photoz/data/DR7DR12Q_clean_flux_cat.hdf5','data')
-    #df_quasars = pd.read_hdf('../class_photoz/data/brightqsos_sim_2k_new.hdf5','data')
+    # df_quasars = pd.read_hdf('../class_photoz/data/DR7DR12Q_clean_flux_cat.hdf5','data')
+    df_quasars = pd.read_hdf('../class_photoz/data/brightqsos_sim_2k_new.hdf5','data')
 
     passband_names = ['SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
                         'TMASS_j', \
@@ -328,91 +335,75 @@ def test_example():
                         'TMASS_k', \
                         'WISE_w1', \
                         'WISE_w2', \
-                        # 'WISE_w3', \
-                        # 'WISE_w4', \
                         ]
 
-    #print "Stars: ",df_stars.shape
-    #print "Quasars: ",df_quasars.shape
-
-    #TODO Only for now delete later
-    #df_stars = df_stars.rename(columns={'sigma_TMASS_ks':'sigma_TMASS_k', \
-    #        'TMASS_ks':'TMASS_k','TMASS_mag_ks':'TMASS_mag_k'})
-
-    #embed this in the sim qso conversion file!
+    # #embed this in the sim qso conversion file!
     for name in passband_names:
         df_quasars.rename(columns={'obsFlux_'+name:name},inplace=True)
         df_quasars.rename(columns={'obsFluxErr_'+name:'sigma_'+name},inplace=True)
 
-
     df_stars,features = qs.prepare_flux_ratio_catalog(df_stars,passband_names)
     df_quasars,features = qs.prepare_flux_ratio_catalog(df_quasars,passband_names)
 
-    #print "Stars: ",df_stars.shape
-    #print "Quasars: ",df_quasars.shape
-
-
-    #Reduce the total set of objects for testing the routines
-    # df_stars = df_stars.sample(frac=0.2)
-    # df_quasars = df_quasars.sample(frac=0.2)
-
-
-
-    #Impose allsky selection criteria on the dataframes
-    #df_quasars['kw2'] = df_quasars.obsMag_TMASS_k-df_quasars.obsMag_WISE_w2
-    #df_quasars['jk'] = df_quasars.obsMag_TMASS_j-df_quasars.obsMag_TMASS_k
-    #df_quasars.query('kw2 >= -0.501208-0.848*jk',inplace=True)
-    #
-    # df_quasars['kw2'] = df_quasars.TMASS_mag_k-df_quasars.WISE_mag_w2
-    # df_quasars['jk'] = df_quasars.TMASS_mag_j-df_quasars.TMASS_mag_k
-    # df_quasars.query('kw2 >= 1.8-0.848*jk',inplace=True)
-    #
-    # df_stars['kw2'] = df_stars.TMASS_mag_k-df_stars.WISE_mag_w2
-    # df_stars['jk'] = df_stars.TMASS_mag_j-df_stars.TMASS_mag_k
-    # df_stars.query('kw2 >= 1.8-0.848*jk',inplace=True)
-
-
     df_stars.query('SDSS_mag_i <= 18.5',inplace=True)
-    df_quasars.query('SDSS_mag_i <= 18.5',inplace=True)
-    #df_quasars.query('obsMag_SDSS_i <= 18.5',inplace=True)
+    # df_quasars.query('SDSS_mag_i <= 18.5',inplace=True)
+    df_quasars.query('obsMag_SDSS_i <= 18.5',inplace=True)
+
     print "Stars: ",df_stars.shape
     print "Quasars: ",df_quasars.shape
 
-    #Create more detailed classes
-    df_stars, df_quasars = create_labels(df_stars, df_quasars,'z')
+    # --------------------------------------------------------------------------
+    # Preparing test and training sets
+    # --------------------------------------------------------------------------
+    #Create detailed classes
+    df_quasars = qs.create_qso_labels(df_quasars, 'mult_class_true', 'z')
+    df_stars = qs.create_star_labels(df_stars, 'mult_class_true', 'star_class')
+
+    # Create binary classes
+    df_quasars['bin_class_true']='QSO'
+    df_stars['bin_class_true']='STAR'
 
     # Make test and training set
-    df_train, df_pred = make_train_pred_set(df_stars, df_quasars, 'class_label', rand_state = 1)
+    df_train, df_pred = qs.make_train_pred_set(df_stars, df_quasars, 0.2, rand_state = 1)
+    print df_train.shape, df_pred.shape
+    # --------------------------------------------------------------------------
+    # Running the Random Forest method
+    # --------------------------------------------------------------------------
 
-    # Build a test sample with a given QSO to STAR ratio
-    # df = qs.build_full_sample(df_stars, df_quasars, 20)
-    df_quasars['label']='QSO'
-    df_stars['label']='STAR'
-
-
-    # Declare labels and select features to classify on
-    labels = ["STAR","QSO"]
-    # features = ['jk', 'kw2']
     features = ['SDSS_i','WISE_w1','TMASS_j','ug','gr','ri','iz','zj','jh',  \
                 'hk', 'kw1', 'w1w2']
-    # features = ['SDSS_i','TMASS_j','ug','gr','ri','iz','zj','jh',  \
-#                 'hk']
-    #features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
-    #features = ['SDSS_i','ug','gr','ri','iz']
-    label = 'class_label'
-    # label = 'label'
+    # features = ['SDSS_i','WISE_w1','ug','gr','ri','iz',  \
+                # 'zw1', 'w1w2']
+    # features = ['SDSS_i','ug','gr','ri','iz']
 
+    label = 'mult_class_true'
 
-    params = {'n_estimators': 200, 'max_depth': 20, 'min_samples_split': 3,
-        'n_jobs': 4, 'random_state': 1}
-
+    params = {'n_estimators': 300, 'max_depth': 25, 'min_samples_split': 4,
+        'n_jobs': 2, 'random_state': 1}
+    print features
+    print params
     rand_state=1
 
-    rf_class.rf_class_example(df_train, df_pred, features, label, params,rand_state)
+    y_true, y_pred = \
+        rf_class.rf_class_example(df_train, df_pred, features, label, params,rand_state)
 
+    # --------------------------------------------------------------------------
+    # Additional analysis
+    # --------------------------------------------------------------------------
 
+    data = {'mult_class_true':y_true,'mult_class_pred':y_pred, 'bin_class_true':df_pred.bin_class_true}
+    df = pd.DataFrame(data)
 
+    df['bin_class_pred'] = 'STAR'
+    qso_query = 'mult_class_pred == "vlowz" or mult_class_pred == "lowz" or mult_class_pred == "midz" or mult_class_pred == "highz"'
+    df.loc[df.query(qso_query).index,'bin_class_pred'] = 'QSO'
+
+    labels = ('QSO','STAR')
+    y_true = df.bin_class_true.values
+    y_pred = df.bin_class_pred.values
+
+    pf_an.classification_analysis(y_true,y_pred,labels)
 
 # dr7dr12q_grid_search()
-load_file_grid_search()
-# test_example()
+# load_file_grid_search()
+full_test()

@@ -49,6 +49,45 @@ def full_analysis(df_test):
 
     plt.show()
 
+def full_analysis_sim(df_test):
+    # df_test = pd.read_hdf('test_set.hdf5','data')
+    # Photoz
+
+    df_test = pf_an.set_pred_classes(df_test)
+
+    print df_test.mult_class_true.value_counts()
+    print df_test.mult_class_pred.value_counts()
+
+    print df_test.bin_class_true.value_counts()
+    print df_test.bin_class_pred.value_counts()
+
+    pf_an.photoz_analysis(df_test, 'pf_photoz', 'z')
+
+    pf_an.photoz_analysis(df_test, 'peak_a_mode', 'z')
+
+    print df_test.mult_class_true.value_counts()
+    print df_test.mult_class_pred.value_counts()
+
+    print df_test.bin_class_true.value_counts()
+    print df_test.bin_class_pred.value_counts()
+
+    #  Binary Class
+    y_true = df_test.bin_class_true.values.astype('string')
+    y_pred = df_test.bin_class_pred.values.astype('string')
+    labels = ('QSO','STAR')
+    pf_an.classification_analysis(y_true,y_pred,labels)
+
+    #  Multiple Classes
+    y_true = df_test.mult_class_true.values.astype('string')
+    y_pred = df_test.mult_class_pred.values.astype('string')
+    labels = df_test.mult_class_true.value_counts().index
+
+    pf_an.classification_analysis(y_true,y_pred,labels)
+
+
+    plt.show()
+
+
 def test_photoz():
 
     # Load the catalog from wich to make the quasar model
@@ -133,11 +172,11 @@ def test_full_fit():
     rand_state = 1
 
     params = {'binning' : 'minimum',
-        'bin_param' : 50,
+        'bin_param' : 100,
         'model_type' : 'median'}
 
-    df_qsos = df_qsos.query('SDSS_mag_i < 18.5')
-    df_stars = df_stars.query('SDSS_mag_i < 18.5')
+    df_qsos = df_qsos.query('SDSS_mag_i < 21.5')
+    df_stars = df_stars.query('SDSS_mag_i < 21.5')
 
     df_stars = qs.create_star_labels(df_stars, star_label, 'star_class')
 
@@ -152,7 +191,7 @@ def test_full_fit():
                         # 'TMASS_j', \
                         # 'TMASS_h', \
                         # 'TMASS_k', \
-                        # 'WISE_w1','WISE_w2', \
+                        'WISE_w1','WISE_w2', \
                         ]
 
     df_stars, features  =  qs.prepare_flux_ratio_catalog(df_stars, \
@@ -161,7 +200,7 @@ def test_full_fit():
     passband_names, sigma=True)
 
     df_train_stars, df_train_qsos, df_test = \
-            qs.make_train_pred_set(df_stars, df_qsos, 0.2, rand_state, 'SDSSTMASSW1W2_emp_i18_5_',
+            qs.make_train_pred_set(df_stars, df_qsos, 0.2, rand_state, 'SDSS_emp_i21_5_',
                                                     concat=False, save = True)
 
     print df_train_stars.mult_class_true.value_counts()
@@ -181,16 +220,95 @@ def test_full_fit():
 
     df_test = pf_an.set_pred_classes(df_test)
 
-    df_test.to_hdf('photofit_SDSS_emp_i18_5.hdf5','data')
+    df_test.to_hdf('photofit_SDSSW1W2_emp_i21_5.hdf5','data')
 
     full_analysis(df_test)
 
 
+def sim_test_full_fit():
+
+    # Load the catalog from wich to make the star model
+    df_stars = pd.read_hdf('../class_photoz/data/DR13_stars_clean_flux_cat.hdf5','data')
+    df_stars.drop(df_stars.query('star_class == "null"').index, inplace=True)
+
+    # Load the catalog from wich to make the quasar model
+    df_qsos = pd.read_hdf('../class_photoz/data/brightqsos_sim_2k_new.hdf5','data')
 
 
-df = pd.read_hdf('photofit_SDSSTMASSW1W2_emp_i18_5.hdf5','data')
-full_analysis(df)
+
+    z_label = 'z'
+    star_label = 'class_label'
+    rand_state = 1
+
+    params = {'binning' : 'minimum',
+        'bin_param' : 50,
+        'model_type' : 'median'}
+
+    df_qsos.query('obsMag_SDSS_i <= 18.5',inplace=True)
+    df_stars = df_stars.query('SDSS_mag_i < 18.5')
+
+    df_stars = qs.create_star_labels(df_stars, star_label, 'star_class')
+
+    # Set binary and multi class columns for evaluation routines
+    df_stars['bin_class_true'] = 'STAR'
+    df_stars['mult_class_true'] = df_stars[star_label]
+    df_qsos['bin_class_true'] = 'QSO'
+    df_qsos = pf_an.set_redshift_classes(df_qsos, 'z', 'mult_class_true')
+
+    #specify passband and other column names for model file
+    passband_names = ['SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
+                        # 'TMASS_j', \
+                        # 'TMASS_h', \
+                        # 'TMASS_k', \
+                        'WISE_w1','WISE_w2', \
+                        ]
+
+    #embed this in the sim qso conversion file!
+    for name in passband_names:
+        df_qsos.rename(columns={'obsFlux_'+name:name},inplace=True)
+        df_qsos.rename(columns={'obsFluxErr_'+name:'sigma_'+name},inplace=True)
+
+
+
+    df_stars, features  =  qs.prepare_flux_ratio_catalog(df_stars, \
+    passband_names, sigma=True)
+    df_qsos, features  =  qs.prepare_flux_ratio_catalog(df_qsos, \
+    passband_names, sigma=True)
+
+    df_train_stars, df_train_qsos, df_test = \
+            qs.make_train_pred_set(df_stars, df_qsos, 0.2, rand_state, 'SDSSW1W2_sim_i18_5_',
+                                                    concat=False, save = True)
+
+    print df_train_stars.mult_class_true.value_counts()
+    print df_train_qsos.mult_class_true.value_counts()
+    print df_test.mult_class_true.value_counts()
+
+
+
+    df_test, qso_prob, qso_chisq = \
+            photoz_fit(df_train_qsos,df_test,features, z_label, params)
+
+    df_test, star_prob, star_chisq, star_model = \
+            star_fit(df_train_stars, df_test, features, star_label, params)
+
+    # Classify the test set according to the lowest chi-squared value
+    df_test = pf_an.set_redshift_classes(df_test, 'pf_photoz', 'qso_class')
+
+    df_test = pf_an.set_pred_classes(df_test)
+
+    df_test.to_hdf('photofit_SDSSW1W2_bin50_sim_i18_5.hdf5','data')
+
+    full_analysis_sim(df_test)
+
+
+
+
+
+
+# df = pd.read_hdf('photofit_SDSSW1W2_sim_i18_5.hdf5','data')
+# full_analysis_sim(df)
 # test_full_fit()
+sim_test_full_fit()
 
 # test_star_fit()
 # test_photoz()
