@@ -234,8 +234,8 @@ def rf_reg_predict(train_set, pred_set, features, label, params, pred_label):
     pred_X = sets.build_matrix(pred_set, features)
 
     # Standardizing the data
-    train_X = preprocessing.robust_scale(train_X)
-    pred_X = preprocessing.robust_scale(pred_X)
+    # train_X = preprocessing.robust_scale(train_X)
+    # pred_X = preprocessing.robust_scale(pred_X)
 
     # Random Forest Regression
     reg = RandomForestRegressor(**params)

@@ -156,7 +156,7 @@ def create_star_labels(df_stars, label_name, star_label):
     df_stars[label_name] = df_stars[star_label]
     # Create a list of the names of the star classes
     star_classes = df_stars[label_name].value_counts().index
-
+    
     # Exclude classes with less than 400 objects in class
     # for label in star_labels:
 

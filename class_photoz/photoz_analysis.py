@@ -67,7 +67,7 @@ def evaluate_photoz(z_true, z_phot):
     return dz03,dz02,dz01
 
 
-def plot_redshifts(y_true,y_pred):
+def plot_redshifts(y_true,y_pred,title='Photometric Redshifts'):
     """
     This function creates a redshift-redshift plot of measured redshifts against
     photometrically determined redshifts. It returns the matplotlib plot.
@@ -112,6 +112,8 @@ def plot_redshifts(y_true,y_pred):
 
     ax.set_xlim(0,5)
     ax.set_ylim(0,5)
+
+    ax.set_title(title)
 
     return plt
 

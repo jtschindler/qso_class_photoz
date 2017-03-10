@@ -10,32 +10,6 @@ from class_photoz import rf_class as rf_class
 from class_photoz import ml_analysis as ml_an
 from class_photoz import photofit_analysis as pf_an
 
-def load_file_grid_search():
-
-    # --------------------------------------------------------------------------
-    # General input parameters
-    # --------------------------------------------------------------------------
-
-    # param_grid = [{'n_estimators': [100,200,300], 'min_samples_split': [2,3,4],
-                    # 'max_depth' : [15,20,25]}]
-    param_grid = [{'n_estimators': [100], 'min_samples_split': [2],
-                    'max_depth' : [20]}]
-
-    rand_state=1
-    scores = ['f1_weighted']
-    label = 'mult_class_true'
-
-    # --------------------------------------------------------------------------
-    # Loading the training and test sets and performing the RF GS
-    # --------------------------------------------------------------------------
-    df_train = pd.read_hdf('SDSSW1W2_emp_i18_5_train.hdf5','data')
-    df_pred = pd.read_hdf('SDSSW1W2_emp_i18_5_test.hdf5','data')
-
-    print df_train[label].value_counts()
-
-    features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
-    rf_class.rf_class_grid_search(df_train, df_pred, features, label ,param_grid, rand_state, scores, 'test')
-
 
 def dr7dr12q_grid_search():
 
@@ -45,17 +19,18 @@ def dr7dr12q_grid_search():
 
     df_stars = pd.read_hdf('../class_photoz/data/DR13_stars_clean_flux_cat.hdf5','data')
     df_quasars = pd.read_hdf('../class_photoz/data/DR7DR12Q_clean_flux_cat.hdf5','data')
+    df_stars.dropna(subset=['star_class'],inplace=True)
 
-    # param_grid = [{'n_estimators': [100,200,300], 'min_samples_split': [2,3,4],
-                    # 'max_depth' : [15,20,25]}]
-    param_grid = [{'n_estimators': [100], 'min_samples_split': [2],
-                    'max_depth' : [20]}]
+    param_grid = [{'n_estimators': [100,200,300], 'min_samples_split': [2,3,4],
+                    'max_depth' : [15,20,25]}]
+    # param_grid = [{'n_estimators': [100], 'min_samples_split': [2],
+                    # 'max_depth' : [20]}]
     rand_state=1
     scores = ['f1_weighted']
 
     # Restrict the data set
-    df_stars.query('SDSS_mag_i <= 21.5',inplace=True)
-    df_quasars.query('SDSS_mag_i <= 21.5',inplace=True)
+    df_stars.query('SDSS_mag_i <= 18.5',inplace=True)
+    df_quasars.query('SDSS_mag_i <= 18.5',inplace=True)
 
     # Create basic classes
     df_quasars['label']='QSO'
@@ -326,13 +301,13 @@ def full_test():
     # Loading and preparing the data files
     # --------------------------------------------------------------------------
     df_stars = pd.read_hdf('../class_photoz/data/DR13_stars_clean_flux_cat.hdf5','data')
-    # df_quasars = pd.read_hdf('../class_photoz/data/DR7DR12Q_clean_flux_cat.hdf5','data')
-    df_quasars = pd.read_hdf('../class_photoz/data/brightqsos_sim_2k_new.hdf5','data')
-
+    df_quasars = pd.read_hdf('../class_photoz/data/DR7DR12Q_clean_flux_cat.hdf5','data')
+    # df_quasars = pd.read_hdf('../class_photoz/data/brightqsos_sim_2k_new.hdf5','data')
+    # df_stars.drop(df_stars.query('star_class == "null"').index, inplace=True)
     passband_names = ['SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
-                        'TMASS_j', \
-                        'TMASS_h', \
-                        'TMASS_k', \
+                        # 'TMASS_j', \
+                        # 'TMASS_h', \
+                        # 'TMASS_k', \
                         'WISE_w1', \
                         'WISE_w2', \
                         ]
@@ -346,8 +321,8 @@ def full_test():
     df_quasars,features = qs.prepare_flux_ratio_catalog(df_quasars,passband_names)
 
     df_stars.query('SDSS_mag_i <= 18.5',inplace=True)
-    # df_quasars.query('SDSS_mag_i <= 18.5',inplace=True)
-    df_quasars.query('obsMag_SDSS_i <= 18.5',inplace=True)
+    df_quasars.query('SDSS_mag_i <= 18.5',inplace=True)
+    # df_quasars.query('obsMag_SDSS_i <= 18.5',inplace=True)
 
     print "Stars: ",df_stars.shape
     print "Quasars: ",df_quasars.shape
@@ -370,10 +345,10 @@ def full_test():
     # Running the Random Forest method
     # --------------------------------------------------------------------------
 
-    features = ['SDSS_i','WISE_w1','TMASS_j','ug','gr','ri','iz','zj','jh',  \
-                'hk', 'kw1', 'w1w2']
-    # features = ['SDSS_i','WISE_w1','ug','gr','ri','iz',  \
-                # 'zw1', 'w1w2']
+    # features = ['SDSS_i','WISE_w1','TMASS_j','ug','gr','ri','iz','zj','jh',  \
+    #             'hk', 'kw1', 'w1w2']
+    features = ['SDSS_i','WISE_w1','ug','gr','ri','iz',  \
+                'zw1', 'w1w2']
     # features = ['SDSS_i','ug','gr','ri','iz']
 
     label = 'mult_class_true'
@@ -404,6 +379,6 @@ def full_test():
 
     pf_an.classification_analysis(y_true,y_pred,labels)
 
-# dr7dr12q_grid_search()
+dr7dr12q_grid_search()
 # load_file_grid_search()
-full_test()
+# full_test()

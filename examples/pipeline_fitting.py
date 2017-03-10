@@ -10,10 +10,6 @@ from class_photoz import ml_analysis as ml_an
 from class_photoz import photofit_analysis as pf_an
 
 
-# 1) Photoz RF
-# 2) Classification RF
-
-# 3) Photofit full routine
 
 def rf_full_emp(df_pred):
     # --------------------------------------------------------------------------
@@ -41,7 +37,7 @@ def rf_full_emp(df_pred):
     # Random Forest Regression Grid Search
     features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
     rand_state = 1
-    params = {'n_estimators': 300, 'max_depth': 20, 'min_samples_split': 4, 'n_jobs': 2, 'random_state':rand_state}
+    params = {'n_estimators': 200, 'max_depth': 25, 'min_samples_split': 2, 'n_jobs': 4, 'random_state':rand_state}
 
     df_pred = rf_reg.rf_reg_predict(df_train, df_pred, features, label, params, 'rf_emp_photoz')
 
@@ -95,7 +91,7 @@ def rf_full_emp(df_pred):
     label = 'mult_class_true'
 
     params = {'n_estimators': 300, 'max_depth': 25, 'min_samples_split': 4,
-        'n_jobs': 2, 'random_state': 1}
+        'n_jobs': 4, 'random_state': 1}
 
     rand_state = 1
 
@@ -147,7 +143,7 @@ def rf_full_sim(df_pred):
     # Random Forest Regression Grid Search
     features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
     rand_state = 1
-    params = {'n_estimators': 300, 'max_depth': 20, 'min_samples_split': 4, 'n_jobs': 2, 'random_state':rand_state}
+    params = {'n_estimators': 50, 'max_depth': 15, 'min_samples_split': 2, 'n_jobs': 4, 'random_state':rand_state}
 
     df_pred = rf_reg.rf_reg_predict(df_train, df_pred, features, label, params, 'rf_sim_photoz')
 

@@ -15,31 +15,6 @@ import ml_sets as sets
 import ml_analysis as ml_an
 
 
-def prepare_qso_star_data(df_stars,df_qsos,features,label,rand_state):
-
-    X_stars,y_stars = sets.build_matrices(df_stars, features,label)
-
-    X_st_tr,X_st_te,y_st_tr,y_st_te = train_test_split(
-            X_stars,y_stars, test_size=0.2,random_state=rand_state)
-
-    X_qsos,y_qsos = sets.build_matrices(df_qsos, features,label)
-
-    X_qs_tr,X_qs_te,y_qs_tr,y_qs_te = train_test_split(
-            X_qsos,y_qsos, test_size=0.2,random_state=rand_state)
-
-    X_train = np.concatenate((X_st_tr,X_qs_tr),axis=0)
-    X_test = np.concatenate((X_st_te,X_qs_te),axis=0)
-
-    y_train = np.concatenate((y_st_tr,y_qs_tr),axis=0)
-    y_test = np.concatenate((y_st_te,y_qs_te),axis=0)
-
-    # Standardizing the data
-    X_train = preprocessing.robust_scale(X_train)
-    X_test = preprocessing.robust_scale(X_test)
-
-
-    return X_train,y_train,X_test,y_test
-
 def rf_class_grid_search(df_train,df_pred, features, label, param_grid, rand_state, scores, name):
     """This routine calculates the random forest classification on a grid of
     hyper-parameters for the random forest method to test the best
@@ -85,7 +60,7 @@ def rf_class_grid_search(df_train,df_pred, features, label, param_grid, rand_sta
         print()
 
         clf = GridSearchCV(RandomForestClassifier(random_state=rand_state),
-            param_grid, cv=5, scoring='%s' % score, n_jobs = 6)
+            param_grid, cv=5, scoring='%s' % score, n_jobs = 4)
 
         clf.fit(X_train, y_train)
 
@@ -142,7 +117,7 @@ def rf_class_validation_curve(df, features, label, params, param_name, param_ran
     X,y = sets.build_matrices(df, features,label)
 
     # Standardizing the data
-    X = preprocessing.robust_scale(X)
+    # X = preprocessing.robust_scale(X)
 
     clf = RandomForestClassifier(**params)
     title = "Validation curve / Random Forest Classifier"
@@ -188,9 +163,8 @@ def  rf_class_predict(df_train, df_pred, features, label, params,
     X_pred = sets.build_matrix(df_pred, features)
 
     # Standardizing the data
-    X_train = preprocessing.robust_scale(X_train)
-    X_pred = preprocessing.robust_scale(X_pred)
-
+    # X_train = preprocessing.robust_scale(X_train)
+    # X_pred = preprocessing.robust_scale(X_pred)
     clf = RandomForestClassifier(**params)
 
     clf.fit(X_train,y_train)
@@ -198,60 +172,6 @@ def  rf_class_predict(df_train, df_pred, features, label, params,
     y_pred = clf.predict(X_pred)
 
     return clf, y_pred
-
-
-# def rf_binaryclass_example(df_stars,df_qsos, features, label, params,rand_state):
-#     """This routine calculates an example of the random forest classification
-#      method. It is aimed at classification with only two classes (STAR/QSO).
-#      It prints the classification report and feature importances, the
-#      ROC/AUC score and shows the ROC curve and precision recall curve for the
-#      chosen hyper-parameters.
-#
-#     Parameters:
-#             df : pandas dataframe
-#             The dataframe containing the features and the label for the
-#             regression.
-#
-#             features : list of strings
-#             List of features
-#
-#             label : string
-#             The label for the regression
-#
-#             params : dictionary
-#             List of input parameters for the regression
-#
-#             rand_state : integer
-#             Setting the random state variables to ensure reproducibility
-#     """
-#
-#     X_train, y_train, X_test, y_test = \
-#             prepare_qso_star_data(df_stars,df_qsos,features,label,rand_state)
-#
-#     clf = RandomForestClassifier(**params)
-#
-#     clf.fit(X_train,y_train)
-#
-#     y_true, y_pred = y_test, clf.predict(X_test)
-#
-#     y_pred_proba = clf.predict_proba(X_test)[:, 0]
-#
-#     ml_an.plot_precision_recall_curve(y_true,y_pred_proba,pos_label="QSO")
-#     plt.show()
-#
-#     feat_importances = clf.feature_importances_
-#
-#     print "Classification Report "
-#     print(classification_report(y_true, y_pred))
-#     print "\n"
-#     print "Feature Importance "
-#     for i in range(len(features)):
-#         print str(features[i])+": "+str(feat_importances[i])
-#     print "\n"
-#
-#     ml_an.plot_roc_curve(y_true, y_pred_proba, pos_label="QSO")
-#
-#     plt.show()
 
 
 
@@ -311,66 +231,3 @@ def rf_class_example(df_train, df_pred, features, label, params, rand_state):
     plt.show()
 
     return y_true, y_pred
-
-
-
-
-
-#
-# def rf_class_predict(train_set, pred_set, features, params, class_label,
-#                     pred_label, class_0_label, class_1_label):
-#
-#     """This function predicts the regression values for pred_set based on the
-#     features specified in the train_set
-#
-#     Parameters:
-#           train_set : pandas dataframe
-#           The dataframe containing the features and the label for the
-#           classification.
-#
-#           pred_set : pandas dataframe
-#           The dataframe containing the features for prediction
-#
-#           features : list of strings
-#           List of features
-#
-#           params : dictionary
-#           List of input parameters for the classification
-#
-#           class_label : string
-#           The label for the classification
-#
-#           pred_Label : string
-#           The name of the new column in pred_set for the classification results
-#
-#           class_0_label : string
-#           The name of the new column in pred_set containing the class 0
-#           probabilities
-#
-#           class_1_label : string
-#           The name of the new column in pred_set containing the class 1
-#           probabilities
-#
-#     Output:
-#           pred_set : pandas dataframe
-#           The dataframe containing the features for prediction and the
-#           regression values in the pred_label named column.
-#     """
-#
-#     train_X, train_y = sets.build_matrices(train_set, features,label=class_label)
-#
-#     pred_X = sets.build_matrix(pred_set, features)
-#
-#     # Standardizing the data
-#     train_X = preprocessing.robust_scale(train_X)
-#     test_X = preprocessing.robust_scale(test_X)
-#
-#     # Random Forest Classification
-#     clf = RandomForestClassifier(**params)
-#     clf.fit(train_X,train_y)
-#
-#     pred_set[class_0_label] = clf.predict_proba(pred_X)[:, 0]
-#     pred_set[class_1_label] = clf.predict_proba(pred_X)[:, 1]
-#     pred_set[pred_label] = clf.predict(pred_X)
-#
-#     return pred_set

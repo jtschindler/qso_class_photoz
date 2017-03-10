@@ -447,10 +447,10 @@ def dr7dr12_test():
 
     features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
     # features = ['SDSS_i','ug','gr','ri','iz']
-    # label = 'Z_VI'
+    label = 'Z_VI'
     rand_state = 1
 
-    params = {'n_estimators': 300, 'max_depth': 20, 'min_samples_split': 4, 'n_jobs': 2, 'random_state':rand_state}
+    params = {'n_estimators': 200, 'max_depth': 25, 'min_samples_split': 2, 'n_jobs': 2, 'random_state':rand_state}
 
 
     rf.rf_reg_example(df_train,features,label,params,rand_state)
@@ -566,6 +566,7 @@ def dr7dr12_predict_simqso():
 
 # DR7DR12_grid_search()
 # test_example()
+dr7dr12_test()
 # simqsos_grid_search()
 # simqso_predict_dr7dr12()
-dr7dr12_predict_simqso()
+# dr7dr12_predict_simqso()
