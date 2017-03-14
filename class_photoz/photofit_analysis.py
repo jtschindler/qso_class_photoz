@@ -55,19 +55,19 @@ def set_pred_classes(df_pred):
 
     # if qso redchisq < star redchisq set mult class to star class
     idx =  df_pred.query('pf_qso_redchisq < pf_star_redchisq').index
-    df_pred.loc[ idx, 'mult_class_pred'] = df_pred.loc[idx,'pf_qso_class']
+    df_pred.loc[ idx, 'pf_mult_class_pred'] = df_pred.loc[idx,'pf_qso_class']
 
     # if qso redchisq >= star redchisq set mult class to qso class
     idx =  df_pred.query('pf_qso_redchisq >= pf_star_redchisq').index
-    df_pred.loc[ idx, 'mult_class_pred'] = df_pred.loc[idx,'pf_star_class']
+    df_pred.loc[ idx, 'pf_mult_class_pred'] = df_pred.loc[idx,'pf_star_class']
 
     # if qso redchisq < star redchisq set binary class to QSO
     idx =  df_pred.query('pf_qso_redchisq < pf_star_redchisq').index
-    df_pred.loc[idx, 'bin_class_pred'] = 'QSO'
+    df_pred.loc[idx, 'pf_bin_class_pred'] = 'QSO'
 
     # if qso redchisq >= star redchisq set binary class to STAR
     idx =  df_pred.query('pf_qso_redchisq >= pf_star_redchisq').index
-    df_pred.loc[ idx, 'bin_class_pred'] = 'STAR'
+    df_pred.loc[ idx, 'pf_bin_class_pred'] = 'STAR'
 
     return df_pred
 

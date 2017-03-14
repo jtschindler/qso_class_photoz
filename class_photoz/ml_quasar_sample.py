@@ -5,13 +5,13 @@ import math
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
 
-def prepare_flux_ratio_catalog(df,passband_names,sigma=False):
+def prepare_flux_ratio_catalog(cat,passband_names,sigma=False):
     """ Calculating the flux ratios from the fluxes provided by
         the input df and dropping all rows with NaN values in the
         process to ensure a full data set
 
     Input:
-            df (DataFrame) as the input flux catalog
+            cat (DataFrame) as the input flux catalog
             passband_names (list) of the filter names considered
                 for calculating the flux ratios
     Output:
@@ -20,7 +20,10 @@ def prepare_flux_ratio_catalog(df,passband_names,sigma=False):
                 the flux ratio columns
     """
 
-    # Drop all rows with NaN values in the passband considered
+    df = cat.copy(deep=True)
+
+    # Drop all rows with Inf and NaN values in the passband considered
+    df.replace([np.inf, -np.inf], np.nan,inplace=True)
     df.dropna(axis=0,how='any',subset=passband_names,inplace=True)
 
 
@@ -28,10 +31,12 @@ def prepare_flux_ratio_catalog(df,passband_names,sigma=False):
     flux_ratio_names = []
     flux_ratio_err_names= []
 
-    for name in passband_names:
-        df.dropna(axis=0,how='any',subset=['sigma_'+name],inplace=True)
+
 
     if sigma :
+
+        for name in passband_names:
+            df.dropna(axis=0,how='any',subset=['sigma_'+name],inplace=True)
 
         for i in range(len(passband_names)-1):
 
@@ -156,7 +161,7 @@ def create_star_labels(df_stars, label_name, star_label):
     df_stars[label_name] = df_stars[star_label]
     # Create a list of the names of the star classes
     star_classes = df_stars[label_name].value_counts().index
-    
+
     # Exclude classes with less than 400 objects in class
     # for label in star_labels:
 

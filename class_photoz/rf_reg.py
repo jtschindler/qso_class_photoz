@@ -224,10 +224,6 @@ def rf_reg_predict(train_set, pred_set, features, label, params, pred_label):
             regression values in the pred_label named column.
     """
 
-    for feature in features:
-      train_set.dropna(axis=0,how='any',subset=[feature],inplace=True)
-
-
     # Building test and training sample
     train_X, train_y = sets.build_matrices(train_set, features, label)
 
