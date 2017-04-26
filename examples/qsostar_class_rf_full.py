@@ -312,7 +312,7 @@ def full_test():
                         'WISE_w2', \
                         ]
 
-    # #embed this in the sim qso conversion file!
+    # embed this in the sim qso conversion file!
     for name in passband_names:
         df_quasars.rename(columns={'obsFlux_'+name:name},inplace=True)
         df_quasars.rename(columns={'obsFluxErr_'+name:'sigma_'+name},inplace=True)
@@ -320,6 +320,7 @@ def full_test():
     df_stars,features = qs.prepare_flux_ratio_catalog(df_stars,passband_names)
     df_quasars,features = qs.prepare_flux_ratio_catalog(df_quasars,passband_names)
 
+    # Introducing selection criteria
     df_stars.query('SDSS_mag_i <= 18.5',inplace=True)
     df_quasars.query('SDSS_mag_i <= 18.5',inplace=True)
     # df_quasars.query('obsMag_SDSS_i <= 18.5',inplace=True)
@@ -359,7 +360,7 @@ def full_test():
     print params
     rand_state=1
 
-    y_true, y_pred = \
+    y_true, y_pred, df_prob = \
         rf_class.rf_class_example(df_train, df_pred, features, label, params,rand_state)
 
     # --------------------------------------------------------------------------
@@ -379,6 +380,6 @@ def full_test():
 
     pf_an.classification_analysis(y_true,y_pred,labels)
 
-dr7dr12q_grid_search()
+# dr7dr12q_grid_search()
 # load_file_grid_search()
-# full_test()
+full_test()

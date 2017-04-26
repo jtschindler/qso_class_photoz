@@ -171,7 +171,10 @@ def  rf_class_predict(df_train, df_pred, features, label, params,
 
     y_pred = clf.predict(X_pred)
 
-    return clf, y_pred
+    # Predicting the probabilities for the classes
+    y_prob = clf.predict_proba(X_pred)
+
+    return clf, y_pred, y_prob
 
 
 
@@ -230,4 +233,17 @@ def rf_class_example(df_train, df_pred, features, label, params, rand_state):
 
     plt.show()
 
-    return y_true, y_pred
+
+
+    # Predicting the probabilities for the classes
+
+    y_prob = clf.predict_proba(X_pred)
+
+    df_prob = pd.DataFrame(y_prob)
+    df_prob.columns = clf.classes_
+    df_prob.index = df_pred.index
+    df_prob['qso_prob'] = df_prob.highz + df_prob.midz + df_prob.lowz + df_prob.vlowz
+    df_prob['true_class'] = y_true
+    df_prob['pred_class'] = y_pred
+
+    return y_true, y_pred, df_prob
