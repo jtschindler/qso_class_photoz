@@ -36,7 +36,7 @@ def grid_search_example():
             ]
 
     # Try a fraction of the whole datafile first
-    df_train = df_train.sample(frac=0.05)
+    df_train = df_train.sample(frac=0.1)
 
     df_train.replace(np.inf, np.nan,inplace=True)
 
@@ -49,7 +49,7 @@ def grid_search_example():
     features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
     label = 'Z'
     rand_state = 1
-    param_grid = [{'C': [1, 10], 'gamma': [0.0001], \
+    param_grid = [{'C': [1, 10], 'gamma': [0.001], \
                 'kernel': ('rbf','linear')}]
     scores = ['mean_absolute_error','mean_squared_error','r2',]
 
@@ -60,7 +60,7 @@ def test_example():
     # --------------------------------------------------------------------------
     # Preparing the feature matrix
     # --------------------------------------------------------------------------
-    df_train = pd.read_hdf('../class_photoz/data/DR7DR14Q_flux_cat.hdf5','data')
+    df_train = pd.read_hdf('../class_photoz/data/DR7DR12Q_clean_flux_cat.hdf5','data')
 
     # Try a fraction of the whole datafile first
     df_train = df_train.sample(frac=0.1)
@@ -81,13 +81,13 @@ def test_example():
     # --------------------------------------------------------------------------
 
     features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
-    label = 'Z'
+    label = 'z'
     rand_state = 1
 
     params = {'kernel':'linear','C':1.0, 'gamma':0.001, 'epsilon':0.2,'cache_size':1200}
 
 
-    svr.svm_reg_example(df_train,features,label,params,rand_state)
+    svr.svm_reg_example(df_train,features,label,params,rand_state,save=True,save_filename='test')
 
 def predict_example():
 

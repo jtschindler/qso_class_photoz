@@ -157,6 +157,9 @@ def  rf_class_predict(df_train, df_pred, features, label, params,
 
             y_pred : array-like
             An array with the predicted classes from df_pred
+
+            y_prob : array-like
+            An array with the predicted class probabilities
     """
 
     X_train, y_train = sets.build_matrices(df_train, features,label=label)
@@ -202,7 +205,7 @@ def rf_class_example(df_train, df_pred, features, label, params, rand_state):
             Setting the random state variables to ensure reproducibility
     """
 
-    clf, y_pred = rf_class_predict(df_train,df_pred, features, label,
+    clf, y_pred, y_prob = rf_class_predict(df_train,df_pred, features, label,
                                                             params, rand_state)
 
     X_pred, y_true = sets.build_matrices(df_pred, features,label=label)

@@ -88,69 +88,6 @@ def rf_reg_grid_search(df,features,label,param_grid,rand_state,scores,name):
         print()
 
 
-def rf_reg_example(df,features,label,params,rand_state):
-    """This routine calculates an example of the random forest regression tuned
-    to photometric redshift estimation. The results will be analyzed with the
-    analyis routines/functions provided in ml_eval.py and photoz_analysis.py
-
-    Parameters:
-            df : pandas dataframe
-            The dataframe containing the features and the label for the
-            regression.
-
-            features : list of strings
-            List of features
-
-            label : string
-            The label for the regression
-
-            params : dictionary
-            List of input parameters for the regression
-
-            rand_state : integer
-            Setting the random state variables to ensure reproducibility
-
-
-    """
-
-    # Building test and training sample
-    X,y = sets.build_matrices(df, features, label)
-
-    # Standardizing the data
-    X = preprocessing.robust_scale(X)
-
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        X,y, test_size=0.2, random_state=rand_state)
-
-    # Leftover from trying out weights
-    # w_train = X_train[:,-1]
-    # X_train = X_train[:,:-1]
-    # w_test = X_test[:,-1]
-    # X_test = X_test[:,:-1]
-
-    # Random Forest Regression
-    reg = RandomForestRegressor(**params)
-
-    reg.fit(X_train,y_train)
-
-    y_pred = reg.predict(X_test)
-
-    feat_importances = reg.feature_importances_
-
-
-    # Evaluate regression method
-    print "Feature Importances "
-    for i in range(len(features)):
-        print str(features[i])+": "+str(feat_importances[i])
-    print "\n"
-
-    ml_an.evaluate_regression(y_test,y_pred)
-
-
-    pz_an.plot_redshifts(y_test,y_pred)
-    pz_an.plot_error_hist(y_test,y_pred)
-    plt.show()
 
 
 def rf_reg_validation_curve(df,features,label,params,val_param,val_range):
@@ -240,3 +177,79 @@ def rf_reg_predict(train_set, pred_set, features, label, params, pred_label):
     pred_set[pred_label] = reg.predict(pred_X)
 
     return pred_set
+
+def rf_reg_example(df,features,label,params,rand_state,save=False,save_filename=None):
+    """This routine calculates an example of the random forest regression tuned
+    to photometric redshift estimation. The results will be analyzed with the
+    analyis routines/functions provided in ml_eval.py and photoz_analysis.py
+
+    Parameters:
+            df : pandas dataframe
+            The dataframe containing the features and the label for the
+            regression.
+
+            features : list of strings
+            List of features
+
+            label : string
+            The label for the regression
+
+            params : dictionary
+            List of input parameters for the regression
+
+            rand_state : integer
+            Setting the random state variables to ensure reproducibility
+
+
+    """
+
+    # Building test and training sample
+    X,y = sets.build_matrices(df, features, label)
+
+    # Standardizing the data
+    X = preprocessing.robust_scale(X)
+
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X,y, test_size=0.2, random_state=rand_state)
+
+    # Leftover from trying out weights
+    # w_train = X_train[:,-1]
+    # X_train = X_train[:,:-1]
+    # w_test = X_test[:,-1]
+    # X_test = X_test[:,:-1]
+
+    # Random Forest Regression
+    reg = RandomForestRegressor(**params)
+
+    reg.fit(X_train,y_train)
+
+    y_pred = reg.predict(X_test)
+
+    feat_importances = reg.feature_importances_
+
+
+    # Save predicted and test y values for later analysis
+
+    if save:
+        if save_filename:
+            results = pd.DataFrame(data=np.array([y_pred,y_test]).T,columns=['y_pred','y_test'])
+            results.to_csv(save_filename+'.csv',index=False)
+            print results
+        else:
+            print "Error: No Filename supplied!"
+
+
+
+    # Evaluate regression method
+    print "Feature Importances "
+    for i in range(len(features)):
+        print str(features[i])+": "+str(feat_importances[i])
+    print "\n"
+
+    ml_an.evaluate_regression(y_test,y_pred)
+
+
+    pz_an.plot_redshifts(y_test,y_pred)
+    pz_an.plot_error_hist(y_test,y_pred)
+    plt.show()
