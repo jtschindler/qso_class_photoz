@@ -190,12 +190,12 @@ def svm_reg_example(df,features,label,params,rand_state, save=False,save_filenam
     y_pred = reg.predict(X_test)
 
     # Save predicted and test y values for later analysis
-    
+
     if save:
         if save_filename:
             results = pd.DataFrame(data=np.array([y_pred,y_test]).T,columns=['y_pred','y_test'])
             results.to_csv(save_filename+'.csv',index=False)
-            print results
+            
         else:
             print "Error: No Filename supplied!"
 

@@ -96,9 +96,9 @@ def test_example():
     #df_quasars = pd.read_hdf('../class_photoz/data/brightqsos_sim_2k_new.hdf5','data')
 
     passband_names = ['SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
-                        'TMASS_j', \
-                        'TMASS_h', \
-                        'TMASS_k', \
+                        #'TMASS_j', \
+                        #'TMASS_h', \
+                        #'TMASS_k', \
                         'WISE_w1', \
                         'WISE_w2', \
                         # 'WISE_w3', \
@@ -121,12 +121,12 @@ def test_example():
 
 
     #Reduce the total set of objects for testing the routines
-    df_stars = df_stars.sample(frac=0.2)
-    df_quasars = df_quasars.sample(frac=0.2)
+    #df_stars = df_stars.sample(frac=0.2)
+    #df_quasars = df_quasars.sample(frac=0.2)
 
 
-    df_stars.query('SDSS_mag_i <= 18.5',inplace=True)
-    df_quasars.query('SDSS_mag_i <=18.5',inplace=True)
+    df_stars.query('SDSS_mag_i <= 21.5',inplace=True)
+    df_quasars.query('SDSS_mag_i <= 21.5',inplace=True)
     #df_quasars.query('obsMag_SDSS_i <= 18.5',inplace=True)
     print "Stars: ",df_stars.shape
     print "Quasars: ",df_quasars.shape
@@ -147,24 +147,24 @@ def test_example():
     df_train, df_pred = qs.make_train_pred_set(df_stars, df_quasars, 0.2, rand_state = 1)
 
 
-    features = ['SDSS_i','WISE_w1','TMASS_j','ug','gr','ri','iz','zj','jh',  \
-                'hk', 'kw1', 'w1w2']
+    #features = ['SDSS_i','WISE_w1','TMASS_j','ug','gr','ri','iz','zj','jh',  \
+    #            'hk', 'kw1', 'w1w2']
     # features = ['SDSS_i','TMASS_j','ug','gr','ri','iz','zj','jh', 'hk']
-    #features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
+    features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
     #features = ['SDSS_i','ug','gr','ri','iz']
 
     label = 'mult_class_true'
 
 
-    params = {'n_estimators': 200, 'max_depth': 20, 'min_samples_split': 3,
-        'n_jobs': 4, 'random_state': 1}
+    params = {'n_estimators': 300, 'max_depth': 25, 'min_samples_split': 3,
+        'n_jobs': 2, 'random_state': 1}
 
     rand_state=1
 
-    # y_true, y_pred, df_prob = rf_class.rf_class_example(df_train, df_pred, features, label, params,rand_state)
-    y_true, y_pred, y_prob = rf_class.rf_class_predict(df_train, df_pred, features, label, params,rand_state)
+    y_true, y_pred, df_prob = rf_class.rf_class_example(df_train, df_pred, features, label, params,rand_state)
+    #y_true, y_pred, y_prob = rf_class.rf_class_predict(df_train, df_pred, features, label, params,rand_state)
 
-    print y_prob
+    #print y_prob
     # df_prob.to_hdf('df_prob.hdf5','data')
 
 

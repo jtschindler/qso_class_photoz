@@ -29,8 +29,8 @@ def dr7dr12q_grid_search():
     scores = ['f1_weighted']
 
     # Restrict the data set
-    df_stars.query('SDSS_mag_i <= 18.5',inplace=True)
-    df_quasars.query('SDSS_mag_i <= 18.5',inplace=True)
+    df_stars.query('SDSS_mag_i <= 21.5',inplace=True)
+    df_quasars.query('SDSS_mag_i <= 21.5',inplace=True)
 
     # Create basic classes
     df_quasars['label']='QSO'
@@ -75,7 +75,7 @@ def dr7dr12q_grid_search():
     # Random Forest Regression Grid Search
     # --------------------------------------------------------------------------
 
-    rf_class.rf_class_grid_search(df_train, df_pred, features, label ,param_grid, rand_state, scores, 'test')
+    #rf_class.rf_class_grid_search(df_train, df_pred, features, label ,param_grid, rand_state, scores, 'test')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -106,12 +106,12 @@ def dr7dr12q_grid_search():
     #Choose label: 'label' = 2 classes, 'class_label'= multiple classes
 
     features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
-
+    print df_train.shape, df_pred.shape
     # --------------------------------------------------------------------------
     # Random Forest Regression Grid Search
     # --------------------------------------------------------------------------
 
-    rf_class.rf_class_grid_search(df_train, df_pred, features, label ,param_grid, rand_state, scores, 'test')
+    #rf_class.rf_class_grid_search(df_train, df_pred, features, label ,param_grid, rand_state, scores, 'test')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -150,7 +150,7 @@ def dr7dr12q_grid_search():
     # Random Forest Regression Grid Search
     # --------------------------------------------------------------------------
 
-    rf_class.rf_class_grid_search(df_train, df_pred, features, label ,param_grid, rand_state, scores, 'SDSSTMASSW1W2_i195')
+    #rf_class.rf_class_grid_search(df_train, df_pred, features, label ,param_grid, rand_state, scores, 'SDSSTMASSW1W2_i195')
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -308,8 +308,8 @@ def full_test():
                         # 'TMASS_j', \
                         # 'TMASS_h', \
                         # 'TMASS_k', \
-                        'WISE_w1', \
-                        'WISE_w2', \
+                        #'WISE_w1', \
+                        #'WISE_w2', \
                         ]
 
     # embed this in the sim qso conversion file!
@@ -321,8 +321,8 @@ def full_test():
     df_quasars,features = qs.prepare_flux_ratio_catalog(df_quasars,passband_names)
 
     # Introducing selection criteria
-    df_stars.query('SDSS_mag_i <= 18.5',inplace=True)
-    df_quasars.query('SDSS_mag_i <= 18.5',inplace=True)
+    df_stars.query('SDSS_mag_i <= 21.5',inplace=True)
+    df_quasars.query('SDSS_mag_i <= 21.5',inplace=True)
     # df_quasars.query('obsMag_SDSS_i <= 18.5',inplace=True)
 
     print "Stars: ",df_stars.shape
@@ -332,7 +332,7 @@ def full_test():
     # Preparing test and training sets
     # --------------------------------------------------------------------------
     #Create detailed classes
-    df_quasars = qs.create_qso_labels(df_quasars, 'mult_class_true', 'z')
+    df_quasars = qs.create_qso_labels(df_quasars, 'mult_class_true', 'Z_VI')
     df_stars = qs.create_star_labels(df_stars, 'mult_class_true', 'star_class')
 
     # Create binary classes
@@ -348,13 +348,13 @@ def full_test():
 
     # features = ['SDSS_i','WISE_w1','TMASS_j','ug','gr','ri','iz','zj','jh',  \
     #             'hk', 'kw1', 'w1w2']
-    features = ['SDSS_i','WISE_w1','ug','gr','ri','iz',  \
-                'zw1', 'w1w2']
-    # features = ['SDSS_i','ug','gr','ri','iz']
+    #features = ['SDSS_i','WISE_w1','ug','gr','ri','iz',  \
+    #            'zw1', 'w1w2']
+    features = ['SDSS_i','ug','gr','ri','iz']
 
     label = 'mult_class_true'
 
-    params = {'n_estimators': 300, 'max_depth': 25, 'min_samples_split': 4,
+    params = {'n_estimators': 300, 'max_depth': 20, 'min_samples_split': 4,
         'n_jobs': 2, 'random_state': 1}
     print features
     print params
@@ -367,18 +367,23 @@ def full_test():
     # Additional analysis
     # --------------------------------------------------------------------------
 
-    data = {'mult_class_true':y_true,'mult_class_pred':y_pred, 'bin_class_true':df_pred.bin_class_true}
+    data = {'mult_class_true':y_true,'mult_class_pred':y_pred}
     df = pd.DataFrame(data)
 
     df['bin_class_pred'] = 'STAR'
+    df['bin_class_true'] = 'STAR'
     qso_query = 'mult_class_pred == "vlowz" or mult_class_pred == "lowz" or mult_class_pred == "midz" or mult_class_pred == "highz"'
     df.loc[df.query(qso_query).index,'bin_class_pred'] = 'QSO'
+    qso_query_true = 'mult_class_true == "vlowz" or mult_class_true == "lowz" or mult_class_true == "midz" or mult_class_true == "highz"'
+    df.loc[df.query(qso_query_true).index,'bin_class_true'] = 'QSO'
 
     labels = ('QSO','STAR')
     y_true = df.bin_class_true.values
     y_pred = df.bin_class_pred.values
 
     pf_an.classification_analysis(y_true,y_pred,labels)
+
+    df.to_hdf('fitted_classes.hdf5','data')
 
 # dr7dr12q_grid_search()
 # load_file_grid_search()

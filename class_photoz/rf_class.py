@@ -228,11 +228,13 @@ def rf_class_example(df_train, df_pred, features, label, params, rand_state):
     cnf_matrix = confusion_matrix(y_true, y_pred, labels=None, sample_weight=None)
 
 
-    ml_an.plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=True,
-                      title='Confusion matrix, with normalization')
+    # ml_an.plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=True,
+                    #   title='Confusion matrix, with normalization')
 
-    ml_an.plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=False,
-                      title='Confusion matrix, without normalization')
+    # ml_an.plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=False,
+                    #   title='Confusion matrix, without normalization')
+
+    ml_an.my_confusion_matrix(cnf_matrix, classes=class_names)
 
     plt.show()
 

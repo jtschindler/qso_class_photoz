@@ -71,7 +71,7 @@ def test_example():
     #     df_train.rename(columns={'obsFluxErr_'+name:'sigma_'+name},inplace=True)
 
     df_train.replace(np.inf, np.nan,inplace=True)
-    df_train.query('10 > Z_VI > 0.0 and PSFMAG_I < 19.0',inplace=True)
+    df_train.query('10 > Z_VI > 0.0 and PSFMAG_I < 18.5',inplace=True)
     # df_train.query('obsMag_SDSS_i < 19.0',inplace=True)
     df_train,features = qs.prepare_flux_ratio_catalog(df_train,passband_names)
 
@@ -81,15 +81,15 @@ def test_example():
     # Random Forest Regression Grid Search
     # --------------------------------------------------------------------------
 
-    features = ['ug','gr','ri','iz','zw1','w1w2']
+    features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
     # features = ['SDSS_i','WISE_w1','TMASS_j','ug','gr','ri','iz','zj','jh', 'hk', 'kw1', 'w1w2']
     label = 'z'
     rand_state = 1
 
-    params = {'n_estimators': 200, 'max_depth': 15, 'min_samples_split': 4, 'n_jobs': 4, 'random_state':rand_state}
+    params = {'n_estimators': 200, 'max_depth': 25, 'min_samples_split': 2, 'n_jobs': 2, 'random_state':rand_state,}
 
 
-    rf.rf_reg_example(df_train,features,label,params,rand_state)
+    rf.rf_reg_example(df_train,features,label,params,rand_state,save=True,save_filename='test')
 
 
 def predict_example():

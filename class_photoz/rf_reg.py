@@ -12,6 +12,7 @@ import ml_sets as sets
 import ml_analysis as ml_an
 import photoz_analysis as pz_an
 
+
 def rf_reg_grid_search(df,features,label,param_grid,rand_state,scores,name):
     """This routine calculates the random forest regression on a grid of
     hyper-parameters for the random forest method to test the best
@@ -235,7 +236,7 @@ def rf_reg_example(df,features,label,params,rand_state,save=False,save_filename=
         if save_filename:
             results = pd.DataFrame(data=np.array([y_pred,y_test]).T,columns=['y_pred','y_test'])
             results.to_csv(save_filename+'.csv',index=False)
-            print results
+            
         else:
             print "Error: No Filename supplied!"
 

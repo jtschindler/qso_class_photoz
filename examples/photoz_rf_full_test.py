@@ -17,6 +17,10 @@ from class_photoz import rf_reg as rf
 from class_photoz import ml_analysis as ml_an
 from class_photoz import photoz_analysis as pz_an
 
+import class_photoz as cl
+
+print cl.__version__
+
 def dr7dr12_grid_search():
     # --------------------------------------------------------------------------
     # Read data file and input parameters
@@ -392,7 +396,7 @@ def simqso_test():
 
 
     df_train.replace(np.inf, np.nan,inplace=True)
-    df_train.query('obsMag_SDSS_i <= 18.5',inplace=True)
+    # df_train.query('obsMag_SDSS_i <= 18.5',inplace=True)
 
 
     df_train,features = qs.prepare_flux_ratio_catalog(df_train,passband_names)
@@ -407,10 +411,10 @@ def simqso_test():
     label = 'z'
     rand_state = 1
 
-    params = {'n_estimators': 50, 'max_depth': 15, 'min_samples_split': 2, 'n_jobs': 2, 'random_state':rand_state}
+    params = {'n_estimators': 300, 'max_depth': 20, 'min_samples_split': 4, 'n_jobs': 2, 'random_state':rand_state}
 
 
-    rf.rf_reg_example(df_train,features,label,params,rand_state)
+    rf.rf_reg_example(df_train,features,label,params,rand_state,save=True,save_filename='rf_sim_sdssw1w2')
 
 
 
@@ -419,6 +423,7 @@ def simqso_test():
 
 
 def dr7dr12_test():
+
     # --------------------------------------------------------------------------
     # Preparing the feature matrix
     # --------------------------------------------------------------------------
@@ -450,10 +455,11 @@ def dr7dr12_test():
     label = 'Z_VI'
     rand_state = 1
 
-    params = {'n_estimators': 200, 'max_depth': 25, 'min_samples_split': 2, 'n_jobs': 2, 'random_state':rand_state}
+    params = {'n_estimators': 300, 'max_depth': 20, 'min_samples_split': 2, 'n_jobs': 2, 'random_state':rand_state}
 
+    print df_train.shape[0]
 
-    rf.rf_reg_example(df_train,features,label,params,rand_state)
+    rf.rf_reg_example(df_train,features,label,params,rand_state,save=True,save_filename='rf_sdssw1w2')
 
 
 
@@ -473,8 +479,8 @@ def simqso_predict_dr7dr12():
 
 
     df_test = df_test.query('0.3 < Z_VI < 5.5')
-    df_train.query('obsMag_SDSS_i <= 18.5',inplace=True)
-    df_test.query('SDSS_mag_i <= 18.5',inplace=True)
+    # df_train.query('obsMag_SDSS_i <= 18.5',inplace=True)
+    # df_test.query('SDSS_mag_i <= 18.5',inplace=True)
     # df_train.query('z > 1.1',inplace=True)
 
     for name in passband_names:
@@ -494,12 +500,13 @@ def simqso_predict_dr7dr12():
     # --------------------------------------------------------------------------
 
     # features = ['SDSS_u','SDSS_i','SDSS_r','SDSS_z','SDSS_g','WISE_w1','WISE_w2']
-    features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
+    #  features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
+    features = ['ug','gr','ri','iz','zw1','w1w2']
     # features = ['SDSS_i','WISE_w1','TMASS_j','ug','gr','ri','iz','zj','jh', 'hks', 'ksw1', 'w1w2']
     label = 'z'
     rand_state = 1
 
-    params = {'n_estimators': 50, 'max_depth': 15, 'min_samples_split': 2, 'n_jobs': 2, 'random_state':rand_state}
+    params = {'n_estimators': 300, 'max_depth': 30, 'min_samples_split': 4, 'n_jobs': 2, 'random_state':rand_state}
 
     df_test = rf.rf_reg_predict(df_train, df_test, features, label, params, 'rf_photoz')
 
@@ -566,7 +573,8 @@ def dr7dr12_predict_simqso():
 
 # DR7DR12_grid_search()
 # test_example()
-dr7dr12_test()
+# dr7dr12_test()
+simqso_test()
 # simqsos_grid_search()
 # simqso_predict_dr7dr12()
 # dr7dr12_predict_simqso()

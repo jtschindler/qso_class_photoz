@@ -60,6 +60,10 @@ def prepare_flux_ratio_catalog(cat,passband_names,sigma=False):
             str(passband_a_name+passband_b_name))
 
     else :
+
+        for name in passband_names:
+            df.dropna(axis=0,how='any',subset=['sigma_'+name],inplace=True)
+
         for i in range(len(passband_names)-1):
 
             passband_a = np.array(df[passband_names[i]])

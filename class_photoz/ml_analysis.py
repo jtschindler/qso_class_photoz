@@ -331,7 +331,7 @@ def plot_roc_curve(y_true, y_pred_proba, pos_label=None):
 
 def plot_confusion_matrix(cnf_matrix, classes,
                           normalize=False,
-                          title='Confusion matrix',
+                          title=r'$\rm{Confusion\ matrix}$',
                           cmap=plt.cm.Blues):
     """
     ADAPTED FROM SCIKIT LEARN EXAMPLES:
@@ -367,11 +367,11 @@ def plot_confusion_matrix(cnf_matrix, classes,
     if normalize:
         cnf_matrix = cnf_matrix.astype('float') / cnf_matrix.sum(axis=1)[:, np.newaxis]
         cnf_matrix = np.around(cnf_matrix,decimals=3)
-        print("Normalized confusion matrix")
+        print(r'$\rm{Normalized\ confusion\ matrix}$')
     else:
-        print('Confusion matrix, without normalization')
+        print(r'$\rm{Confusion\ matrix}$')
 
-    fig = plt.figure(num=None,figsize=(9,9), dpi=100)
+    fig = plt.figure(num=None,figsize=(6,6), dpi=100)
     fig.subplots_adjust(left=0.12, bottom=0.1, right=0.98, top=0.96)
     ax = fig.add_subplot(1,1,1)
 
@@ -384,21 +384,117 @@ def plot_confusion_matrix(cnf_matrix, classes,
     tick_marks = np.arange(len(classes))
     ax.set_xticks(tick_marks)
     ax.set_yticks(tick_marks)
-    ax.set_xticklabels(classes, rotation=45)
-    ax.set_yticklabels(classes, rotation=45)
+
+    class_names = []
+    for cl in classes:
+        class_names.append(r'$\rm{'+str(cl)+'}$')
+
+    ax.set_xticklabels(class_names, rotation=45)
+    ax.set_yticklabels(class_names, rotation=45)
 
 
-    ax.set_ylabel(r'$\rm{True\ label}$')
-    ax.set_xlabel(r'$\rm{Predicted\ label}$')
+    ax.set_ylabel(r'$\rm{True\ label}$',fontsize=15)
+    ax.set_xlabel(r'$\rm{Predicted\ label}$',fontsize=15)
 
     thresh = cnf_matrix.max() / 2.
     for i, j in itertools.product(range(cnf_matrix.shape[0]), \
                                         range(cnf_matrix.shape[1])):
-        plt.text(j, i, cnf_matrix[i, j],
+        plt.text(j, i,r'$\rm{'+str(cnf_matrix[i, j])+'}$',
                  horizontalalignment="center",
                  color="white" if cnf_matrix[i, j] > thresh else "black")
 
 
-    
+
+
+    return plt
+
+
+def my_confusion_matrix(cnf_matrix, classes,
+                          title=r'$\rm{Confusion\ matrix}$',
+                          cmap=plt.cm.Blues):
+    """
+    ADAPTED FROM SCIKIT LEARN EXAMPLES:
+    http://scikit-learn.org/stable/auto_examples/model_selection/
+    plot_confusion_matrix.html#sphx-glr-auto-examples-model-selection-plot-confusion-matrix-py
+
+    This function plots the confusion matrix of a classification as an image
+    using imshow.
+
+    Parameters:
+
+        cnf_matrix: array-like
+        The confusion matrix as calculated by sklearn.metrics.confusion_matrix
+
+        classes : list of strings
+        This is the list of class names. It can be provided by clf.classes_
+
+        normalize: boolean
+        Boolean to chose normalization of each row to 1
+
+        title: string
+        The title of the confusion matrix
+
+        cmap: colormap
+        The color map to use for coloring the matrix elements
+
+    Returns:
+        plt : matplotlib plot
+
+    """
+
+
+
+    n_cnf_matrix = cnf_matrix.astype('float') / cnf_matrix.sum(axis=1)[:, np.newaxis]
+    n_cnf_matrix = np.around(n_cnf_matrix,decimals=3)
+
+    fig = plt.figure(num=None,figsize=(6,6), dpi=100)
+    fig.subplots_adjust(left=0.15, bottom=0.15, right=0.98, top=0.96)
+    ax = fig.add_subplot(1,1,1)
+
+    im = ax.imshow(n_cnf_matrix, interpolation='nearest', cmap=cmap)
+    #ax.set_title(title)
+    #cbar = fig.colorbar(im,ax=ax)
+    #label=r'$\rm{Fraction}$'
+    #cbar.set_label(label,fontsize=14)
+    classes = classes[1:]
+    tick_marks = np.arange(len(classes))
+    ax.set_xticks(tick_marks)
+    ax.set_yticks(tick_marks)
+
+    class_names = []
+    for cl in classes:
+        class_names.append(r'$\rm{'+str(cl)+'}$')
+
+    ax.set_xticklabels(class_names, rotation=45)
+    ax.set_yticklabels(class_names, rotation=45)
+
+
+    ax.set_ylabel(r'$\rm{True\ label}$',fontsize=20)
+    ax.set_xlabel(r'$\rm{Predicted\ label}$',fontsize=20)
+
+    thresh = n_cnf_matrix.max() *0.6
+    for i, j in itertools.product(range(cnf_matrix.shape[0]), \
+                                        range(cnf_matrix.shape[1])):
+
+        if n_cnf_matrix[i,j] > 0:
+            plt.text(j, i-0.175,r'$\rm{'+str(cnf_matrix[i, j])+'}$',
+                    va='center',horizontalalignment='center',
+                     color="white" if n_cnf_matrix[i, j] > thresh else "black")
+
+            plt.text(j, i+0.2,r'$\rm{'+str((n_cnf_matrix[i, j]*100))+'}\%$',
+                     va='center',horizontalalignment='center',
+                     color="white" if n_cnf_matrix[i, j] > thresh else "black")
+
+        elif cnf_matrix[i,j ]>0:
+            plt.text(j, i-0.175,r'$\rm{'+str(cnf_matrix[i, j])+'}$',
+                    va='center',horizontalalignment='center',
+                     color="white" if n_cnf_matrix[i, j] > thresh else "black")
+        else:
+            plt.text(j, i,'-',
+            va='center',horizontalalignment='center',
+            color="white" if n_cnf_matrix[i, j] > thresh else "black")
+
+
+
 
     return plt

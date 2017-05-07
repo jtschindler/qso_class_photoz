@@ -344,7 +344,7 @@ def dr7dr12_test():
     passband_names = [\
             'SDSS_u','SDSS_g','SDSS_r','SDSS_i','SDSS_z', \
             # 'TMASS_j','TMASS_h','TMASS_k', \
-            # 'WISE_w1','WISE_w2', \
+            'WISE_w1','WISE_w2', \
             # 'WISE_w3' \
             ]
 
@@ -362,15 +362,15 @@ def dr7dr12_test():
     # Random Forest Regression Grid Search
     # --------------------------------------------------------------------------
 
-    # features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
-    features = ['SDSS_i','ug','gr','ri','iz']
+    features = ['SDSS_i','WISE_w1','ug','gr','ri','iz','zw1','w1w2']
+    # features = ['SDSS_i','ug','gr','ri','iz']
     label = 'Z_VI'
     rand_state = 1
 
     params = {'kernel':'rbf', 'epsilon':0.1, 'C':10, 'gamma':0.1,'cache_size':2000}
 
 
-    svr.svm_reg_example(df_train,features,label,params,rand_state)
+    svr.svm_reg_example(df_train,features,label,params,rand_state,save=True,save_filename='svr_sdssw1w2')
 
 
 
@@ -585,7 +585,7 @@ def dr7dr12_predict_simqso():
 #DR7DR12_grid_search()
 # grid_search_example()
 # predict_example()
-# dr7dr12_test()
+dr7dr12_test()
 # simqso_predict_dr7dr12()
-dr7dr12_predict_simqso()
+# dr7dr12_predict_simqso()
 # simqso_test()
