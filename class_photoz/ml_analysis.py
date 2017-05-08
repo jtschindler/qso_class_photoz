@@ -363,6 +363,9 @@ def plot_confusion_matrix(cnf_matrix, classes,
 
     """
 
+    # Tex font
+    rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+    rc('text', usetex=True)
 
     if normalize:
         cnf_matrix = cnf_matrix.astype('float') / cnf_matrix.sum(axis=1)[:, np.newaxis]
@@ -443,6 +446,10 @@ def my_confusion_matrix(cnf_matrix, classes,
     """
 
 
+    # Tex font
+    rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+    rc('text', usetex=True)
+
 
     n_cnf_matrix = cnf_matrix.astype('float') / cnf_matrix.sum(axis=1)[:, np.newaxis]
     n_cnf_matrix = np.around(n_cnf_matrix,decimals=3)
@@ -465,12 +472,12 @@ def my_confusion_matrix(cnf_matrix, classes,
     for cl in classes:
         class_names.append(r'$\rm{'+str(cl)+'}$')
 
-    ax.set_xticklabels(class_names, rotation=45)
-    ax.set_yticklabels(class_names, rotation=45)
+    ax.set_xticklabels(class_names, rotation=45, fontsize = 12)
+    ax.set_yticklabels(class_names, rotation=45, fontsize = 12)
 
 
-    ax.set_ylabel(r'$\rm{True\ label}$',fontsize=20)
-    ax.set_xlabel(r'$\rm{Predicted\ label}$',fontsize=20)
+    ax.set_ylabel(r'$\rm{True\ label}$',fontsize=24)
+    ax.set_xlabel(r'$\rm{Predicted\ label}$',fontsize=24)
 
     thresh = n_cnf_matrix.max() *0.6
     for i, j in itertools.product(range(cnf_matrix.shape[0]), \
@@ -478,20 +485,20 @@ def my_confusion_matrix(cnf_matrix, classes,
 
         if n_cnf_matrix[i,j] > 0:
             plt.text(j, i-0.175,r'$\rm{'+str(cnf_matrix[i, j])+'}$',
-                    va='center',horizontalalignment='center',
+                    va='center',horizontalalignment='center', size =12,
                      color="white" if n_cnf_matrix[i, j] > thresh else "black")
 
             plt.text(j, i+0.2,r'$\rm{'+str((n_cnf_matrix[i, j]*100))+'}\%$',
-                     va='center',horizontalalignment='center',
+                     va='center',horizontalalignment='center', size =12,
                      color="white" if n_cnf_matrix[i, j] > thresh else "black")
 
         elif cnf_matrix[i,j ]>0:
             plt.text(j, i-0.175,r'$\rm{'+str(cnf_matrix[i, j])+'}$',
-                    va='center',horizontalalignment='center',
+                    va='center',horizontalalignment='center', size =12,
                      color="white" if n_cnf_matrix[i, j] > thresh else "black")
         else:
             plt.text(j, i,'-',
-            va='center',horizontalalignment='center',
+            va='center',horizontalalignment='center', size =12,
             color="white" if n_cnf_matrix[i, j] > thresh else "black")
 
 

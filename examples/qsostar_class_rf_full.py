@@ -308,8 +308,8 @@ def full_test():
                         # 'TMASS_j', \
                         # 'TMASS_h', \
                         # 'TMASS_k', \
-                        #'WISE_w1', \
-                        #'WISE_w2', \
+                        'WISE_w1', \
+                        'WISE_w2', \
                         ]
 
     # embed this in the sim qso conversion file!
@@ -347,14 +347,14 @@ def full_test():
     # --------------------------------------------------------------------------
 
     # features = ['SDSS_i','WISE_w1','TMASS_j','ug','gr','ri','iz','zj','jh',  \
-    #             'hk', 'kw1', 'w1w2']
-    #features = ['SDSS_i','WISE_w1','ug','gr','ri','iz',  \
-    #            'zw1', 'w1w2']
+                #  'hk', 'kw1', 'w1w2']
+    # features = ['SDSS_i','WISE_w1','ug','gr','ri','iz',  \
+    #           'zw1', 'w1w2']
     features = ['SDSS_i','ug','gr','ri','iz']
 
     label = 'mult_class_true'
 
-    params = {'n_estimators': 300, 'max_depth': 20, 'min_samples_split': 4,
+    params = {'n_estimators': 300, 'max_depth': 20, 'min_samples_split': 2,
         'n_jobs': 2, 'random_state': 1}
     print features
     print params
