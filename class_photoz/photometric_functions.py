@@ -15,7 +15,13 @@ def VEGAtoAB(VEGAMAG,band_name):
                     'WISE_w3':5.174,
                     'WISE_w4':6.62,
                     'UNWISE_w1':2.699,
-                    'UNWISE_w2':3.339}
+                    'UNWISE_w2':3.339,
+                    'PS_g': 0.0 ,
+                    'PS_r': 0.0,
+                    'PS_i': 0.0,
+                    'PS_z': 0.0,
+                    'PS_y': 0.0
+                    }
 
     return VEGAMAG+mag_corr_dict[band_name]
 
@@ -33,7 +39,13 @@ def VEGAtoAB_flux(band_name):
                     'WISE_w3':5.174,
                     'WISE_w4':6.62,
                     'UNWISE_w1':2.699,
-                    'UNWISE_w2':3.339}
+                    'UNWISE_w2':3.339,
+                    'PS_g': 0.0 ,
+                    'PS_r': 0.0,
+                    'PS_i': 0.0,
+                    'PS_z': 0.0,
+                    'PS_y': 0.0
+                    }
 
     return np.power(10,-0.4*mag_corr_dict[band_name])
 
@@ -54,7 +66,13 @@ def deredden_flux(flux, flux_band, ext, ext_band):
         'WISE_w3':0.0,
         'WISE_w4':0.0,
         'UNWISE_w1':0.189,
-        'UNWISE_w2':0.146}
+        'UNWISE_w2':0.146,
+        'PS_g': 3.172 ,
+        'PS_r': 2.271,
+        'PS_i': 1.682,
+        'PS_z': 1.322,
+        'PS_y': 1.087
+        }
 
     extinction = ext/ext_deltamag_dict[ext_band]*ext_deltamag_dict[flux_band]
 
@@ -76,10 +94,16 @@ def deredden_mag(mag, mag_band, ext, ext_band):
         'WISE_w3':0.0,
         'WISE_w4':0.0,
         'UNWISE_w1':0.189,
-        'UNWISE_w2':0.146}
+        'UNWISE_w2':0.146
+        'PS_g': 3.172 ,
+        'PS_r': 2.271,
+        'PS_i': 1.682,
+        'PS_z': 1.322,
+        'PS_y': 1.087
+        }
 
     extinction = ext/ext_deltamag_dict[ext_band]*ext_deltamag_dict[mag_band]
-    
+
     return mag - extinction
     # Schlafly&Finkbeiner 2011, Fitzpatrick 1999, IRSA
     # http://irsa.ipac.caltech.edu/applications/DUST
@@ -95,9 +119,9 @@ def ABMAGtoFLUX(ab_mag):
 
 def ABERRtoFLUXERR(ab_mag,ab_magerr):
     return abs(-0.4*np.log(10) * ab_magerr * np.power(10,-0.4*ab_mag) * 3631)
-  
+
 def ASINHMAGERRtoFLUXERR(mag,magerr,band):
-    
+
     if band == 'SDSS_u':
         b = 1.4e-10
     elif band == 'SDSS_g':
@@ -111,7 +135,7 @@ def ASINHMAGERRtoFLUXERR(mag,magerr,band):
     else :
         print 'Conversion from ASINHMAG to FLUX unsuccessful \n FILTER BAND NOT RECOGNIZED'
         return -1
-      
+
     return abs(2*b*np.cosh( (-mag) / (2.5/np.log(10)) - np.log(b)) * ((-magerr) / (2.5/np.log(10)))*3631)
 
 def ASINHMAGtoFLUX(mag,band):

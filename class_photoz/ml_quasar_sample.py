@@ -26,7 +26,6 @@ def prepare_flux_ratio_catalog(cat,passband_names,sigma=False):
     df.replace([np.inf, -np.inf], np.nan,inplace=True)
     df.dropna(axis=0,how='any',subset=passband_names,inplace=True)
 
-
     # Calculate the flux ratios and add them to the dataframe
     flux_ratio_names = []
     flux_ratio_err_names= []
@@ -61,8 +60,8 @@ def prepare_flux_ratio_catalog(cat,passband_names,sigma=False):
 
     else :
 
-        for name in passband_names:
-            df.dropna(axis=0,how='any',subset=['sigma_'+name],inplace=True)
+        #for name in passband_names:
+            #df.dropna(axis=0,how='any',subset=['sigma_'+name],inplace=True)
 
         for i in range(len(passband_names)-1):
 
