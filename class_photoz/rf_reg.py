@@ -61,7 +61,7 @@ def rf_reg_grid_search(df,features,label,param_grid,rand_state,scores,name):
         print()
 
         reg = GridSearchCV(RandomForestRegressor(random_state=rand_state), \
-                        param_grid,scoring='%s' % score,cv=4,n_jobs=4)
+                        param_grid,scoring='%s' % score,cv=5,n_jobs=4)
 
         reg.fit(X_train, y_train)
 
@@ -236,7 +236,7 @@ def rf_reg_example(df,features,label,params,rand_state,save=False,save_filename=
         if save_filename:
             results = pd.DataFrame(data=np.array([y_pred,y_test]).T,columns=['y_pred','y_test'])
             results.to_csv(save_filename+'.csv',index=False)
-            
+
         else:
             print "Error: No Filename supplied!"
 
