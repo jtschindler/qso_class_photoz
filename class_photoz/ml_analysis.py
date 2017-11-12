@@ -1,17 +1,16 @@
-import pandas as pd
+
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib
+
 import itertools
 from matplotlib import rc
 import matplotlib.gridspec as gridspec
 from matplotlib.pyplot import cm
 from scipy.stats import sigmaclip
-# from sklearn.learning_curve import learning_curve
-# from sklearn.learning_curve import validation_curve
-from sklearn.metrics import precision_recall_curve, average_precision_score
+
+#from sklearn.metrics import precision_recall_curve, average_precision_score
 from sklearn.metrics import roc_curve, auc
-from sklearn.metrics import roc_auc_score
+#from sklearn.metrics import roc_auc_score
 
 from sklearn.metrics import explained_variance_score
 from sklearn.metrics import mean_absolute_error

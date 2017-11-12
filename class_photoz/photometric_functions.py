@@ -7,9 +7,9 @@ def VEGAtoAB(VEGAMAG,band_name):
                     'SDSS_r':0.0,
                     'SDSS_i':0.0,
                     'SDSS_z':0.02,
-                    'TMASS_j':0.894,
-                    'TMASS_h':1.374,
-                    'TMASS_k':1.84,
+                    'TMASS_j':0.894, # 0.91 Blanton 2007 Table 1
+                    'TMASS_h':1.374, # 1.39 Blanton 2007 Table 1
+                    'TMASS_k':1.84, # 1.85 Blanton 2007 Table 1
                     'WISE_w1':2.699,
                     'WISE_w2':3.339,
                     'WISE_w3':5.174,
@@ -22,6 +22,8 @@ def VEGAtoAB(VEGAMAG,band_name):
                     'PS_z': 0.0,
                     'PS_y': 0.0
                     }
+# For WISE to AB converison see
+# http://wise2.ipac.caltech.edu/docs/release/allsky/expsup/sec4_4h.html#example
 
     return VEGAMAG+mag_corr_dict[band_name]
 
@@ -52,15 +54,16 @@ def VEGAtoAB_flux(band_name):
 
 def deredden_flux(flux, flux_band, ext, ext_band):
     ext_deltamag_dict = \
-        {'A_V':3.1,
+        {'EBV':1.0,
+         'A_V':3.1,
         'SDSS_u':4.239,
         'SDSS_g':3.303,
         'SDSS_r':2.285,
         'SDSS_i':1.698,
         'SDSS_z':1.263,
-        'TMASS_j':0.709,
-        'TMASS_h':0.449,
-        'TMASS_k':0.302,
+        'TMASS_j':0.723,
+        'TMASS_h':0.460,
+        'TMASS_k':0.310,
         'WISE_w1':0.189,
         'WISE_w2':0.146,
         'WISE_w3':0.0,
@@ -80,15 +83,16 @@ def deredden_flux(flux, flux_band, ext, ext_band):
 
 def deredden_mag(mag, mag_band, ext, ext_band):
     ext_deltamag_dict = \
-        {'A_V':3.1,
+        {'EBV':1.0,
+        'A_V':3.1,
         'SDSS_u':4.239,
         'SDSS_g':3.303,
         'SDSS_r':2.285,
         'SDSS_i':1.698,
         'SDSS_z':1.263,
-        'TMASS_j':0.709,
-        'TMASS_h':0.449,
-        'TMASS_k':0.302,
+        'TMASS_j':0.723,
+        'TMASS_h':0.460,
+        'TMASS_k':0.310,
         'WISE_w1':0.189,
         'WISE_w2':0.146,
         'WISE_w3':0.0,
@@ -102,6 +106,7 @@ def deredden_mag(mag, mag_band, ext, ext_band):
         'PS_y': 1.087
         }
 
+    # These values are delta_m/E(B-V),
     extinction = ext/ext_deltamag_dict[ext_band]*ext_deltamag_dict[mag_band]
 
     return mag - extinction

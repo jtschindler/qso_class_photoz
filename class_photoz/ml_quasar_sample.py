@@ -1,9 +1,8 @@
-import pandas as pd
-import numpy as np
-import math
 
-from sklearn import preprocessing
+import numpy as np
+import pandas as pd
 from sklearn.model_selection import train_test_split
+
 
 def prepare_flux_ratio_catalog(cat,passband_names,sigma=False):
     """ Calculating the flux ratios from the fluxes provided by
@@ -55,7 +54,7 @@ def prepare_flux_ratio_catalog(cat,passband_names,sigma=False):
             df[str('sigma_'+passband_a_name+passband_b_name)] = \
             np.sqrt((sigma_a/passband_b)**2 + (passband_a/passband_b**2*sigma_b))
 
-            flux_ratio_err_names.append('sigma_'+ \
+            flux_ratio_err_names.append('sigma_' +
             str(passband_a_name+passband_b_name))
 
     else :
@@ -215,7 +214,6 @@ def create_qso_labels(df_qsos, label_name, z_label):
     highz=[1.5,2.2,3.5,10]
 
     # names of the redshift class labels
-    # labels=['0<z<=1.5','1.5<z<=2.2','2.2<=3.5','3.5<z']
     labels=['vlowz','lowz','midz','highz']
 
     # create new column and fill it with the value "null"

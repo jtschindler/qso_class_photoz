@@ -1,6 +1,5 @@
-import pandas as pd
+
 import numpy as np
-import math
 
 
 def build_matrices(df, features,label, drop_nans = True):

@@ -1,9 +1,11 @@
+
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import rc
 from matplotlib.colors import LogNorm
-from sklearn.learning_curve import validation_curve
+#from sklearn.learning_curve import validation_curve
+
 
 def evaluate_photoz(z_true, z_phot):
     """
@@ -67,7 +69,7 @@ def evaluate_photoz(z_true, z_phot):
     return dz03,dz02,dz01
 
 
-def plot_redshifts(y_true,y_pred,title='Photometric Redshifts'):
+def plot_redshifts(y_true, y_pred):
     """
     This function creates a redshift-redshift plot of measured redshifts against
     photometrically determined redshifts. It returns the matplotlib plot.
@@ -85,35 +87,38 @@ def plot_redshifts(y_true,y_pred,title='Photometric Redshifts'):
     """
 
     # Tex font
-    rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+    rc('font', **{'family': 'sans-serif', 'sans-serif': ['Helvetica']})
     rc('text', usetex=True)
 
-    fig = plt.figure(num=None,figsize=(6,6), dpi=140)
-    fig.subplots_adjust(left=0.1, bottom=0.1, right=0.98, top=0.96)
-    ax = fig.add_subplot(1,1,1)
+    fig = plt.figure(num=None, figsize=(4.5, 4), dpi=140)
+    fig.subplots_adjust(left=0.12, bottom=0.14, right=0.94, top=0.96)
+    ax = fig.add_subplot(1, 1, 1)
 
     matplotlib.rcParams['contour.negative_linestyle'] = 'solid'
 
-    cmap = plt.cm.Blues
-    cmap.set_bad('0.85',1.0)
+    cmap = plt.cm.viridis
+    cmap.set_bad('1.0',1.0)
 
-    cax = plt.hist2d(y_true,y_pred, bins=240,range =  [[0,6], [0,6]],
-    norm = LogNorm(), cmap=cmap, zorder=0)
-    cbar = plt.colorbar(ticks=[1,5,10,20,40,80])
-    cbar.ax.set_yticklabels([r'$1$',r'$5$',r'$10$',r'$20$',r'$40$',r'$80$'])
-    cbar.set_label(label=r'$\rm{Number\ of\ objects}$',size=20)
+    cax = plt.hist2d(y_true, y_pred, bins=240, range=[[0, 6],[0, 6]],
+    norm=LogNorm(), cmap=cmap, zorder=0, vmax=350)
+    cbar = plt.colorbar(ticks=[1, 5, 10, 25, 50, 100, 300])
+    cbar.ax.set_yticklabels([r'$1$', r'$5$',  r'$10$',r'$25$', r'$50$',
+                            r'$100$', r'$300$'], fontsize=14)
+    cbar.set_label(label=r'$\rm{Number\ of\ objects}$', size=15)
 
+    ax.plot(np.arange(6), np.arange(6)+0.3, 'w', linewidth=2.0)
+    ax.plot(np.arange(6), np.arange(6)-0.3, 'w', linewidth=2.0)
+    ax.plot(np.arange(6), np.arange(6)-0.0, 'w', linewidth=2.0)
+    ax.plot(np.arange(6), np.arange(6)+0.3, 'k', linewidth=1)
+    ax.plot(np.arange(6), np.arange(6)-0.3, 'k', linewidth=1)
+    ax.plot(np.arange(6), np.arange(6)-0.0, 'k', linewidth=1)
 
-    ax.plot(np.arange(6),np.arange(6),'k',linewidth=1)
+    ax.set_xlabel(r'$\rm{Spectoscopic\ redshift}$', fontsize =17)
+    ax.set_ylabel(r'$\rm{Photometric\ redshift\ estimate}$', fontsize=17)
+    ax.tick_params(axis='both', which='major', labelsize=14)
 
-
-    ax.set_xlabel(r'$\rm{Measured\ redshift}$',fontsize =20)
-    ax.set_ylabel(r'$\rm{Photometric\ redshift\ estimate}$', fontsize = 20)
-
-    ax.set_xlim(0,5)
-    ax.set_ylim(0,5)
-
-    ax.set_title(title)
+    ax.set_xlim(0, 5)
+    ax.set_ylim(0, 5)
 
     return plt
 

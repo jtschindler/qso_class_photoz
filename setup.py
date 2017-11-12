@@ -16,7 +16,7 @@ setup(name='qso_class_photoz',
       url='',
       packages=['class_photoz'],
       provides=['class_photoz'],
-      package_data={'class_photoz':['data/*.*']},
+      #package_data={'class_photoz':['data/*.*']},
       requires=['numpy', 'matplotlib','scipy','astropy','sklearn','pandas'],
       keywords=['Scientific/Engineering'],
      )

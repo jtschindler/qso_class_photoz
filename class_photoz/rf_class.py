@@ -1,21 +1,17 @@
+
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 
-
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
-from sklearn import preprocessing
-
 
 import ml_sets as sets
 import ml_analysis as ml_an
 
 
-def rf_class_grid_search(df_train,df_pred, features, label, param_grid, rand_state, scores, name):
+def rf_class_grid_search(df_train, df_pred, features, label, param_grid, rand_state, scores, name):
     """This routine calculates the random forest classification on a grid of
     hyper-parameters for the random forest method to test the best
     hyper-parameters. The analysis results of the test will be written out and
@@ -47,20 +43,19 @@ def rf_class_grid_search(df_train,df_pred, features, label, param_grid, rand_sta
 
     """
 
-
-    X_train, y_train = sets.build_matrices(df_train, features,label=label)
-    X_test, y_test = sets.build_matrices(df_pred, features,label=label)
+    X_train, y_train = sets.build_matrices(df_train, features, label=label)
+    X_test, y_test = sets.build_matrices(df_pred, features, label=label)
 
     print X_train.shape, X_test.shape
 
-    print pd.Series(y_train).value_counts() , pd.Series(y_test).value_counts()
+    print pd.Series(y_train).value_counts(), pd.Series(y_test).value_counts()
 
     for score in scores:
         print("# Tuning hyper-parameters for %s" % score)
         print()
 
         clf = GridSearchCV(RandomForestClassifier(random_state=rand_state),
-            param_grid, cv=5, scoring='%s' % score, n_jobs = 4)
+            param_grid, cv=5, scoring='%s' % score, n_jobs=4)
 
         clf.fit(X_train, y_train)
 
@@ -90,7 +85,6 @@ def rf_class_grid_search(df_train,df_pred, features, label, param_grid, rand_sta
         print()
         df = pd.DataFrame(clf.cv_results_)
         df.to_hdf('RF_GS_CLASS_'+name+'_'+score+'.hdf5','data')
-
 
 
 def rf_class_validation_curve(df, features, label, params, param_name, param_range):
@@ -127,8 +121,8 @@ def rf_class_validation_curve(df, features, label, params, param_name, param_ran
     plt.show()
 
 
-def  rf_class_predict(df_train, df_pred, features, label, params,
-                                                                rand_state):
+def rf_class_predict(df_train, df_pred, features, label, params,
+    rand_state):
     """This routine calculates an example of the random forest classification
      method. It is aimed at multi-class classification.
      It prints the classification report and feature importances and shows the
@@ -162,12 +156,13 @@ def  rf_class_predict(df_train, df_pred, features, label, params,
             An array with the predicted class probabilities
     """
 
-    X_train, y_train = sets.build_matrices(df_train, features,label=label)
+    X_train, y_train = sets.build_matrices(df_train, features, label=label)
     X_pred = sets.build_matrix(df_pred, features)
 
     # Standardizing the data
     # X_train = preprocessing.robust_scale(X_train)
     # X_pred = preprocessing.robust_scale(X_pred)
+
     clf = RandomForestClassifier(**params)
 
     clf.fit(X_train,y_train)
@@ -178,7 +173,6 @@ def  rf_class_predict(df_train, df_pred, features, label, params,
     y_prob = clf.predict_proba(X_pred)
 
     return clf, y_pred, y_prob
-
 
 
 def rf_class_example(df_train, df_pred, features, label, params, rand_state):
@@ -227,21 +221,11 @@ def rf_class_example(df_train, df_pred, features, label, params, rand_state):
     class_names = clf.classes_
     cnf_matrix = confusion_matrix(y_true, y_pred, labels=None, sample_weight=None)
 
-
-    # ml_an.plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=True,
-                    #   title='Confusion matrix, with normalization')
-
-    # ml_an.plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=False,
-                    #   title='Confusion matrix, without normalization')
-
     ml_an.my_confusion_matrix(cnf_matrix, classes=class_names)
 
     plt.show()
 
-
-
     # Predicting the probabilities for the classes
-
     y_prob = clf.predict_proba(X_pred)
 
     df_prob = pd.DataFrame(y_prob)
