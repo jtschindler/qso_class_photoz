@@ -117,16 +117,14 @@ def rf_reg_validation_curve(df,features,label,params,val_param,val_range):
 
     """
 
-    print "THIS FUNCTION IS DEPRECATED"
-
     X,y = sets.build_matrices(df, features,label)
 
     # Random Forest Regression
     reg = RandomForestRegressor(**params)
 
-    #Calculate and plot validation curve
+    # Calculate and plot validation curve
     pz_an.plot_validation_curve(reg, val_param, val_range, X, y,
-                                        ylim=(0.0, 1.1), cv=None, n_jobs=4)
+                                        ylim=(0.0, 1.1), cv=None, n_jobs=2)
 
     plt.show()
 
@@ -214,12 +212,6 @@ def rf_reg_example(df,features,label,params,rand_state,save=False,save_filename=
     X_train, X_test, y_train, y_test = train_test_split(
         X,y, test_size=0.2, random_state=rand_state)
 
-    # Leftover from trying out weights
-    # w_train = X_train[:,-1]
-    # X_train = X_train[:,:-1]
-    # w_test = X_test[:,-1]
-    # X_test = X_test[:,:-1]
-
     # Random Forest Regression
     reg = RandomForestRegressor(**params)
 
@@ -231,7 +223,6 @@ def rf_reg_example(df,features,label,params,rand_state,save=False,save_filename=
 
 
     # Save predicted and test y values for later analysis
-
     if save:
         if save_filename:
             results = pd.DataFrame(data=np.array([y_pred,y_test]).T,columns=['y_pred','y_test'])

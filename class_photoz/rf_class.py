@@ -69,20 +69,19 @@ def rf_class_grid_search(df_train, df_pred, features, label, param_grid, rand_st
         y_pred = y_pred.astype('string')
 
         print(classification_report(y_true, y_pred))
-        print()
+        print "\n"
 
-        print("Best parameters set found on training set:")
-        print()
+        print("Best parameters set found on training set:\n")
         print(clf.best_params_)
-        print()
+        print "\n"
         print("Grid scores on training set:")
-        print()
+        print "\n"
         means = clf.cv_results_['mean_test_score']
         stds = clf.cv_results_['std_test_score']
         for mean, std, params in zip(means, stds, clf.cv_results_['params']):
             print("%0.3f (+/-%0.03f) for %r"
                 % (mean, std * 2, params))
-        print()
+        print "\n"
         df = pd.DataFrame(clf.cv_results_)
         df.to_hdf('RF_GS_CLASS_'+name+'_'+score+'.hdf5','data')
 
@@ -105,8 +104,6 @@ def rf_class_validation_curve(df, features, label, params, param_name, param_ran
     Output:
             None
     """
-
-    print "THIS FUNCTION IS DEPRECATED"
 
     X,y = sets.build_matrices(df, features,label)
 
