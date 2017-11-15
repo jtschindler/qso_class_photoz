@@ -230,7 +230,7 @@ def plot_validation_curve(estimator, param_name, param_range, title, X, y,
     test_scores_std = np.std(test_scores, axis=1)
 
     plt.title(title)
-    plt.xlabel(param_name)
+    plt.xlabel('Parameter')
     plt.ylabel("Score")
 
     plt.plot(param_range, train_scores_mean, label="Training score", color="r")
